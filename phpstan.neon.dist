@@ -37,4 +37,5 @@ parameters:
             superclassToSuffixMapping:
                 PHPStan\Command\ErrorFormatter\ErrorFormatter: Formatter
 
-    baselinesPerIdentifierDirectory: %currentWorkingDirectory%
+    shipmonkBaselinePerIdentifier:
+        directory: %currentWorkingDirectory%

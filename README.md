@@ -47,7 +47,9 @@ includes:
     - baselines/loader.neon
 
 parameters:
-    baselinesPerIdentifierDirectory: baselines
+    shipmonkBaselinePerIdentifier:
+        directory: baselines
+        indent: '    '
 ```
 
 Prepare composer script to simplify generation:

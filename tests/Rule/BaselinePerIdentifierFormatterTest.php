@@ -18,9 +18,7 @@ class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
         $fakeRoot = sys_get_temp_dir() . '/' . uniqid('root');
         @mkdir($fakeRoot . '/baselines', 0777, true);
 
-        $formatter = new BaselinePerIdentifierFormatter(
-            $fakeRoot . '/baselines',
-        );
+        $formatter = new BaselinePerIdentifierFormatter($fakeRoot . '/baselines', '    ');
 
         $formatter->formatErrors(
             $this->createAnalysisResult(

@@ -27,7 +27,9 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
     private string $baselinesDir;
 
-    public function __construct(string $baselinesDir)
+    private string $indent;
+
+    public function __construct(string $baselinesDir, string $indent)
     {
         $baselinesRealDir = realpath($baselinesDir);
 
@@ -36,6 +38,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         }
 
         $this->baselinesDir = $baselinesRealDir;
+        $this->indent = $indent;
     }
 
     public function formatErrors(
@@ -116,7 +119,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
     private function getNeon(mixed $data): string
     {
-        return trim(Neon::encode($data, blockMode: true, indentation: '    ')) . "\n";
+        return trim(Neon::encode($data, blockMode: true, indentation: $this->indent)) . "\n";
     }
 
     private function escape(string $value): string

@@ -2,7 +2,15 @@ services:
     errorFormatter.baselinePerIdentifier:
         class: ShipMonk\PHPStan\Baseline\BaselinePerIdentifierFormatter
         arguments:
-            baselinesDir: %baselinesPerIdentifierDirectory%
+            baselinesDir: %shipmonkBaselinePerIdentifier.directory%
+            indent: %shipmonkBaselinePerIdentifier.indent%
+
+parameters:
+    shipmonkBaselinePerIdentifier:
+        indent: '    '
 
 parametersSchema:
-    baselinesPerIdentifierDirectory: string()
+    shipmonkBaselinePerIdentifier: structure([
+        directory: string()
+        indent: string()
+    ])
