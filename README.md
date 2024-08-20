@@ -20,7 +20,7 @@ parameters:
 	ignoreErrors:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-			path: app/index.php
+			path: ../app/index.php
 			count: 1
 ```
 
@@ -48,7 +48,7 @@ includes:
 
 parameters:
     shipmonkBaselinePerIdentifier:
-        directory: baselines
+        directory: %currentWorkingDirectory%/baselines
         indent: '    '
 ```
 
