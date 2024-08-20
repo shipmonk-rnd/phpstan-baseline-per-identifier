@@ -14,7 +14,7 @@
     "require": {
         "php": "^8.0",
         "nette/neon": "^2.0 || ^3.0 || ^4.0",
-        "phpstan/phpstan": "^1.11.0"
+        "phpstan/phpstan": "^1.11.5"
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "10.6.0",
