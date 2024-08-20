@@ -1,0 +1,8 @@
+services:
+    errorFormatter.baselinePerIdentifier:
+        class: ShipMonk\PHPStan\Baseline\BaselinePerIdentifierFormatter
+        arguments:
+            baselinesDir: %baselinesPerIdentifierDirectory%
+
+parametersSchema:
+    baselinesPerIdentifierDirectory: string()

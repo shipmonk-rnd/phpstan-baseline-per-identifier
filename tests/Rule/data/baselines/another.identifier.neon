@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error to escape ''\#$#'
+            count: 1
+            path: ../app/config.php

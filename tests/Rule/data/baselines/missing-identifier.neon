@@ -1,0 +1,8 @@
+# total 1 errors
+
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error 3$#'
+            count: 1
+            path: ../app/index.php

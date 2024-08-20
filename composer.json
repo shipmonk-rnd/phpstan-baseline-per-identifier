@@ -1,0 +1,73 @@
+{
+    "name": "shipmonk/phpstan-baseline-per-identifier",
+    "description": "Error formatter for PHPStan that generates baseline files per each error identifier",
+    "license": [
+        "MIT"
+    ],
+    "type": "phpstan-extension",
+    "keywords": [
+        "phpstan",
+        "phpstan baseline",
+        "phpstan extension",
+        "error identifier"
+    ],
+    "require": {
+        "php": "^8.0",
+        "nette/neon": "^2.0 || ^3.0 || ^4.0",
+        "phpstan/phpstan": "^1.11.0"
+    },
+    "require-dev": {
+        "editorconfig-checker/editorconfig-checker": "10.6.0",
+        "ergebnis/composer-normalize": "2.43.0",
+        "phpstan/phpstan-phpunit": "1.4.0",
+        "phpstan/phpstan-strict-rules": "1.6.0",
+        "phpunit/phpunit": "9.6.20",
+        "shipmonk/composer-dependency-analyser": "1.7",
+        "shipmonk/name-collision-detector": "2.1.1",
+        "shipmonk/phpstan-rules": "3.1.0",
+        "slevomat/coding-standard": "8.15.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ShipMonk\\PHPStan\\Baseline\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ShipMonk\\PHPStan\\Baseline\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": false,
+            "ergebnis/composer-normalize": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "phpstan": {
+            "includes": [
+                "extension.neon"
+            ]
+        }
+    },
+    "scripts": {
+        "check": [
+            "@check:composer",
+            "@check:ec",
+            "@check:cs",
+            "@check:types",
+            "@check:tests",
+            "@check:collisions",
+            "@check:dependencies"
+        ],
+        "check:collisions": "detect-collisions src tests",
+        "check:composer": "composer normalize --dry-run --no-check-lock --no-update-lock",
+        "check:cs": "phpcs",
+        "check:dependencies": "composer-dependency-analyser",
+        "check:ec": "ec src tests",
+        "check:tests": "phpunit tests",
+        "check:types": "phpstan analyse -vvv --ansi",
+        "fix:cs": "phpcbf"
+    }
+}
