@@ -6,6 +6,7 @@
     ],
     "type": "phpstan-extension",
     "keywords": [
+        "dev",
         "phpstan",
         "phpstan baseline",
         "phpstan extension",
