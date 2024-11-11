@@ -71,3 +71,9 @@ Regenerate the baselines:
 ```sh
 composer generate:baseline:phpstan
 ```
+
+## Migration from single baseline
+
+1. `rm phpstan-baseline.neon` (and remove its include from `phpstan.neon.dist`)
+2. `mkdir baselines`
+3. `composer generate:baseline:phpstan`
