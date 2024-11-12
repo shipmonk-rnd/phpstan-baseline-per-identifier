@@ -38,6 +38,9 @@
             "ShipMonk\\PHPStan\\Baseline\\": "tests/"
         }
     },
+    "bin": [
+        "bin/split-phpstan-baseline"
+    ],
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": false,

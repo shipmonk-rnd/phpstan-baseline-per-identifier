@@ -17,11 +17,11 @@ Each file looks like this:
 # total 1 error
 
 parameters:
-	ignoreErrors:
-		-
-			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-			path: ../app/index.php
-			count: 1
+    ignoreErrors:
+        -
+            message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+            path: ../app/index.php
+            count: 1
 ```
 
 ## Installation:
@@ -37,8 +37,34 @@ includes:
     - vendor/shipmonk/phpstan-baseline-per-identifier/extension.neon
 ```
 
+## Usage
 
-## Usage:
+Setup baselines loader (can be empty for initial run). Other files will be placed beside that file:
+```neon
+# phpstan.neon.dist
+includes:
+    - baselines/loader.neon # instead of traditional phpstan-baseline.neon
+```
+
+Run native baseline generation and split it into multiple files via our script:
+```sh
+vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon
+```
+
+_(optional)_ You can simplify generation with e.g. composer script:
+```json
+{
+    "scripts": {
+        "generate:baseline:phpstan": [
+            "@phpstan --generate-baseline=baselines/loader.neon",
+            "@split-phpstan-baseline baselines/loader.neon"
+        ]
+    }
+}
+```
+
+<details>
+<summary><h3>Legacy usage</h3></summary>
 
 Setup where your baseline files should be stored and include its loader:
 ```neon
@@ -66,14 +92,15 @@ Prepare composer script to simplify generation:
 }
 ```
 
-Regenerate the baselines:
+</details>
 
-```sh
-composer generate:baseline:phpstan
-```
+## Cli options
+- ``--tabs`` to use tabs as indents in generated neon files
 
-## Migration from single baseline
+## Migrating from single baseline
 
 1. `rm phpstan-baseline.neon` (and remove its include from `phpstan.neon.dist`)
 2. `mkdir baselines`
-3. `composer generate:baseline:phpstan`
+3. `touch baselines/loader.neon`  (and include it in `phpstan.neon.dist`)
+4. Run the split script from above
+

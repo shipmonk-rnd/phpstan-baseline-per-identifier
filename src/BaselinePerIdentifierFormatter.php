@@ -3,7 +3,6 @@
 namespace ShipMonk\PHPStan\Baseline;
 
 use LogicException;
-use Nette\Neon\Neon;
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\ErrorFormatter\ErrorFormatter;
 use PHPStan\Command\Output;
@@ -14,14 +13,15 @@ use function file_put_contents;
 use function implode;
 use function ksort;
 use function preg_quote;
-use function preg_replace;
 use function realpath;
 use function sprintf;
 use function str_repeat;
-use function trim;
 use const DIRECTORY_SEPARATOR;
 use const SORT_STRING;
 
+/**
+ * @deprecated Use new approach, see readme
+ */
 class BaselinePerIdentifierFormatter implements ErrorFormatter
 {
 
@@ -86,9 +86,9 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
                 foreach ($fileErrorsCounts as $message => $count) {
                     $errorsToOutput[] = [
-                        'message' => $this->escape('#^' . preg_quote($message, '#') . '$#'),
+                        'message' => NeonHelper::escape('#^' . preg_quote($message, '#') . '$#'),
                         'count' => $count,
-                        'path' => $this->escape($file),
+                        'path' => NeonHelper::escape($file),
                     ];
                 }
             }
@@ -100,7 +100,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
             $output->writeLineFormatted(sprintf('Writing baseline file %s with %d errors', $baselineFilePath, $errorsCount));
 
             $prefix = "# total $errorsCount errors\n\n";
-            $contents = $prefix . $this->getNeon(['parameters' => ['ignoreErrors' => $errorsToOutput]]);
+            $contents = $prefix . NeonHelper::encode(['parameters' => ['ignoreErrors' => $errorsToOutput]], $this->indent);
             $written = file_put_contents($baselineFilePath, $contents);
 
             if ($written === false) {
@@ -108,29 +108,19 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
             }
         }
 
-        $writtenLoader = file_put_contents($this->baselinesDir . '/loader.neon', $this->getNeon(['includes' => $includes]));
+        $writtenLoader = file_put_contents($this->baselinesDir . '/loader.neon', NeonHelper::encode(['includes' => $includes], $this->indent));
 
         if ($writtenLoader === false) {
             throw new LogicException('Error while writing to ' . $this->baselinesDir . '/loader.neon');
         }
 
+        $output->writeLineFormatted('');
+        $output->writeLineFormatted('<notice>You are using deprecated approach to split baselines which cannot utilize PHPStan result cache</notice>');
+        $output->writeLineFormatted('<notice>Consider switching to new approach via:<notice>');
+        $output->writeLineFormatted("vendor/bin/phpstan --generate-baseline=$this->baselinesDir/loader.neon && vendor/bin/split-phpstan-baseline $this->baselinesDir/loader.neon");
+        $output->writeLineFormatted('');
+
         return 0;
-    }
-
-    private function getNeon(mixed $data): string
-    {
-        return trim(Neon::encode($data, blockMode: true, indentation: $this->indent)) . "\n";
-    }
-
-    private function escape(string $value): string
-    {
-        $return = preg_replace('#^@|%#', '$0$0', $value);
-
-        if ($return === null) {
-            throw new LogicException('Error while escaping ' . $value);
-        }
-
-        return $return;
     }
 
     private function getPathDifference(string $from, string $to): string
