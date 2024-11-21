@@ -116,9 +116,9 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         }
 
         $output->writeLineFormatted('');
-        $output->writeLineFormatted('<notice>You are using deprecated approach to split baselines which cannot utilize PHPStan result cache</notice>');
-        $output->writeLineFormatted('<notice>Consider switching to new approach via:<notice>');
-        $output->writeLineFormatted("vendor/bin/phpstan --generate-baseline=$this->baselinesDir/loader.neon && vendor/bin/split-phpstan-baseline $this->baselinesDir/loader.neon");
+        $output->writeLineFormatted('⚠️  <comment>You are using deprecated approach to split baselines which cannot utilize PHPStan result cache</comment> ⚠️');
+        $output->writeLineFormatted('    Consider switching to new approach via:');
+        $output->writeLineFormatted("    vendor/bin/phpstan --generate-baseline=$this->baselinesDir/loader.neon && vendor/bin/split-phpstan-baseline $this->baselinesDir/loader.neon");
         $output->writeLineFormatted('');
 
         return 0;
