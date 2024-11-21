@@ -12,16 +12,55 @@ use function proc_open;
 use function stream_get_contents;
 use function sys_get_temp_dir;
 use function uniqid;
+use function var_export;
 
 class BinTest extends TestCase
 {
 
-    public function testFormat(): void
+    public function testNeon(): void
     {
-        $fakeRoot = sys_get_temp_dir() . '/' . uniqid('split');
-        @mkdir($fakeRoot . '/baselines', 0777, true);
+        $fakeRoot = $this->prepareSampleFolder();
+        $squashed = $this->getSampleErrors();
 
-        $squashed = [
+        file_put_contents($fakeRoot . '/baselines/loader.neon', Neon::encode($squashed));
+
+        $this->runCommand('php bin/split-phpstan-baseline ' . $fakeRoot . '/baselines/loader.neon', __DIR__ . '/..', 0);
+
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon/loader.neon', $fakeRoot . '/baselines/loader.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
+    }
+
+    public function testPhp(): void
+    {
+        $fakeRoot = $this->prepareSampleFolder();
+        $squashed = $this->getSampleErrors();
+
+        file_put_contents($fakeRoot . '/baselines/loader.php', '<?php return ' . var_export($squashed, true) . ';');
+
+        $this->runCommand('php bin/split-phpstan-baseline ' . $fakeRoot . '/baselines/loader.php', __DIR__ . '/..', 0);
+
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/loader.php', $fakeRoot . '/baselines/loader.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/sample.identifier.php', $fakeRoot . '/baselines/sample.identifier.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/another.identifier.php', $fakeRoot . '/baselines/another.identifier.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/missing-identifier.php', $fakeRoot . '/baselines/missing-identifier.php');
+    }
+
+    private function prepareSampleFolder(): string
+    {
+        $folder = sys_get_temp_dir() . '/' . uniqid('split');
+        @mkdir($folder . '/baselines', 0777, true);
+
+        return $folder;
+    }
+
+    /**
+     * @return array{parameters: array{ignoreErrors: array{0: array{message: string, count: int, path: string, identifier?: string}}}}
+     */
+    private function getSampleErrors(): array
+    {
+        return [
             'parameters' => [
                 'ignoreErrors' => [
                     [
@@ -44,15 +83,6 @@ class BinTest extends TestCase
                 ],
             ],
         ];
-
-        file_put_contents($fakeRoot . '/baselines/loader.neon', Neon::encode($squashed));
-
-        $this->runCommand('php bin/split-phpstan-baseline ' . $fakeRoot . '/baselines/loader.neon', __DIR__ . '/..', 0);
-
-        self::assertFileEquals(__DIR__ . '/Rule/data/baselines/loader.neon', $fakeRoot . '/baselines/loader.neon');
-        self::assertFileEquals(__DIR__ . '/Rule/data/baselines/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/Rule/data/baselines/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/Rule/data/baselines/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
     }
 
     private function runCommand(
