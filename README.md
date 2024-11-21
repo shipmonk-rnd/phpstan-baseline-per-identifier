@@ -32,7 +32,7 @@ composer require --dev shipmonk/phpstan-baseline-per-identifier
 
 ## Usage
 
-Setup baselines loader (can be empty for initial run). Other files will be placed beside that file:
+Setup baselines loader, other files will be placed beside that file:
 ```neon
 # phpstan.neon.dist
 includes:
