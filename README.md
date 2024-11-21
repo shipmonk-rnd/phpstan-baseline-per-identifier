@@ -30,13 +30,6 @@ parameters:
 composer require --dev shipmonk/phpstan-baseline-per-identifier
 ```
 
-Use [official extension-installer](https://phpstan.org/user-guide/extension-library#installing-extensions) or just load the extension:
-
-```neon
-includes:
-    - vendor/shipmonk/phpstan-baseline-per-identifier/extension.neon
-```
-
 ## Usage
 
 Setup baselines loader (can be empty for initial run). Other files will be placed beside that file:
@@ -70,6 +63,7 @@ Setup where your baseline files should be stored and include its loader:
 ```neon
 # phpstan.neon.dist
 includes:
+    - vendor/shipmonk/phpstan-baseline-per-identifier/extension.neon # or use extension-installer
     - baselines/loader.neon
 
 parameters:
