@@ -26,25 +26,38 @@ $indent = isset($providedOptions['tabs'])
     : '    ';
 
 if ($loaderFile === null) {
-    fwrite(STDERR, "Missing argument of generated baseline file.\n");
+    fwrite(STDERR, "\n! Missing argument of generated baseline file.\n\n");
     exit(1);
 }
 
 if (!is_file($loaderFile)) {
-    fwrite(STDERR, "File '$loaderFile' not found\n");
+    fwrite(STDERR, "\n! File '$loaderFile' not found\n\n");
     exit(1);
 }
 
-$folder = dirname($loaderFile);
+$splFile = new SplFileInfo($loaderFile);
+
+$folder = $splFile->getPath();
+$extension = $splFile->getExtension();
+
+if ($extension !== 'neon') {
+    fwrite(STDERR, "\n! Invalid file extension '$extension' of '$loaderFile', expected neon file\n\n");
+    exit(1);
+}
 
 try {
     $data = Neon::decodeFile($loaderFile);
 } catch (NeonException $e) {
-    fwrite(STDERR, "Invalid argument, expected a valid neon file: " . $e->getMessage() . "\n");
+    fwrite(STDERR, "\n! Invalid argument, expected a valid neon file: " . $e->getMessage() . "\n\n");
     exit(1);
 }
-if ($data === false || !isset($data['parameters']['ignoreErrors'])) {
-    fwrite(STDERR, "Invalid argument, expected neon file with 'parameters.ignoreErrors' key in $loaderFile.\n Did you run native baseline generation first?\n Do so with vendor/bin/phpstan --generate-baseline=$loaderFile\n");
+if (!isset($data['parameters']['ignoreErrors'])) {
+    fwrite(
+        STDERR,
+        "\n! Invalid argument, expected neon file with 'parameters.ignoreErrors' key in '$loaderFile'." .
+        "\n - Did you run native baseline generation first?" .
+        "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFile\n\n"
+    );
     exit(1);
 }
 
@@ -64,7 +77,8 @@ foreach ($groupedErrors as $identifier => $errors) {
     $loaderData['includes'][] = $identifier . '.neon';
     $outputData = ['parameters' => ['ignoreErrors' => $errors]];
     $errorsCount = count($errors);
-    $prefix = "# total $errorsCount errors\n\n";
+    $plural = $errorsCount === 1 ? '' : 's';
+    $prefix = "# total $errorsCount error$plural\n\n";
     $contents = $prefix . NeonHelper::encode($outputData, $indent);
     file_put_contents($filePath, $contents);
     echo "Writing baseline file $filePath with $errorsCount errors\n";

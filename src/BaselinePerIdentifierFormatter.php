@@ -99,7 +99,8 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
             $output->writeLineFormatted(sprintf('Writing baseline file %s with %d errors', $baselineFilePath, $errorsCount));
 
-            $prefix = "# total $errorsCount errors\n\n";
+            $plurality = $errorsCount === 1 ? '' : 's';
+            $prefix = "# total $errorsCount error$plurality\n\n";
             $contents = $prefix . NeonHelper::encode(['parameters' => ['ignoreErrors' => $errorsToOutput]], $this->indent);
             $written = file_put_contents($baselineFilePath, $contents);
 
