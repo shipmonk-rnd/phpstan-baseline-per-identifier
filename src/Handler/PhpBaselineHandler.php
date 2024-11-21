@@ -48,10 +48,13 @@ class PhpBaselineHandler implements BaselineHandler
     public function encodeBaselineLoader(array $filePaths, string $indent): string
     {
         $php = "<?php declare(strict_types = 1);\n\n";
+        $php .= "return array_merge(\n";
 
         foreach ($filePaths as $filePath) {
-            $php .= "require __DIR__ . '/$filePath';\n";
+            $php .= "{$indent}require __DIR__ . '/$filePath',\n";
         }
+
+        $php .= ");\n";
 
         return $php;
     }

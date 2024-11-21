@@ -45,7 +45,7 @@ if (!is_file($loaderFile)) {
 }
 
 $splFile = new SplFileInfo($loaderFile);
-$folder = $splFile->getPath();
+$folder = dirname($splFile->getRealPath());
 $extension = $splFile->getExtension();
 
 try {
@@ -74,7 +74,7 @@ foreach ($data['parameters']['ignoreErrors'] as $index => $error) {
     $groupedErrors[$identifier][] = [
         'message' => $message,
         'count' => $count,
-        'path' => $path,
+        'path' => str_replace($folder, '', $path), // __DIR__ got expanded for php
     ];
 }
 
