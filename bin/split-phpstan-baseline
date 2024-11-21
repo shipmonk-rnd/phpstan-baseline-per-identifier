@@ -6,7 +6,7 @@ use Nette\Neon\Neon;
 use ShipMonk\PHPStan\Baseline\NeonHelper;
 
 $autoloadFiles = [
-    __DIR__ . '/../autoload.php',
+    __DIR__ . '/../../../autoload.php',
     __DIR__ . '/../vendor/autoload.php',
 ];
 
