@@ -91,6 +91,9 @@ Prepare composer script to simplify generation:
 ## Cli options
 - ``--tabs`` to use tabs as indents in generated neon files
 
+## PHP Baseline
+- If the loader file extension is php, the generated files will be php files as well
+
 ## Migrating from single baseline
 
 1. `rm phpstan-baseline.neon` (and remove its include from `phpstan.neon.dist`)
