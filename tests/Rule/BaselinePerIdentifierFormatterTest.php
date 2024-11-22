@@ -31,10 +31,10 @@ class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
             $this->createOutput(),
         );
 
-        self::assertFileEquals(__DIR__ . '/data/baselines/loader.neon', $fakeRoot . '/baselines/loader.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon/loader.neon', $fakeRoot . '/baselines/loader.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
     }
 
     /**

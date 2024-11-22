@@ -1,9 +1,11 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use Nette\Neon\Exception as NeonException;
-use Nette\Neon\Neon;
-use ShipMonk\PHPStan\Baseline\NeonHelper;
+namespace ShipMonk\PHPStan\Baseline;
+
+use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
+use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
+use SplFileInfo;
 
 $autoloadFiles = [
     __DIR__ . '/../../../autoload.php',
@@ -17,6 +19,15 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 
+/**
+ * @return never
+ */
+function error(string $message): void
+{
+    fwrite(STDERR, "\n! $message\n\n");
+    exit(1);
+}
+
 $providedOptions = getopt('', ['tabs'], $restIndex);
 $args = array_slice($argv, $restIndex);
 
@@ -26,63 +37,66 @@ $indent = isset($providedOptions['tabs'])
     : '    ';
 
 if ($loaderFile === null) {
-    fwrite(STDERR, "\n! Missing argument of generated baseline file.\n\n");
-    exit(1);
+    error(
+        "Missing argument. Usage:\n".
+        " vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon"
+    );
 }
 
 if (!is_file($loaderFile)) {
-    fwrite(STDERR, "\n! File '$loaderFile' not found\n\n");
-    exit(1);
+    error("Invalid argument, '$loaderFile' is not a file");
 }
 
 $splFile = new SplFileInfo($loaderFile);
-
-$folder = $splFile->getPath();
+$folder = dirname($splFile->getRealPath());
 $extension = $splFile->getExtension();
 
-if ($extension !== 'neon') {
-    fwrite(STDERR, "\n! Invalid file extension '$extension' of '$loaderFile', expected neon file\n\n");
-    exit(1);
-}
-
 try {
-    $data = Neon::decodeFile($loaderFile);
-} catch (NeonException $e) {
-    fwrite(STDERR, "\n! Invalid argument, expected a valid neon file: " . $e->getMessage() . "\n\n");
-    exit(1);
+    $handler = HandlerFactory::create($extension);
+    $data = $handler->decodeBaseline($loaderFile);
+} catch (ErrorException $e) {
+    error($e->getMessage());
 }
 if (!isset($data['parameters']['ignoreErrors'])) {
-    fwrite(
-        STDERR,
-        "\n! Invalid argument, expected neon file with 'parameters.ignoreErrors' key in '$loaderFile'." .
+    error(
+        "Invalid argument, expected $extension file with 'parameters.ignoreErrors' key in '$loaderFile'." .
         "\n - Did you run native baseline generation first?" .
-        "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFile\n\n"
+        "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFile"
     );
-    exit(1);
 }
 
 $groupedErrors = [];
-foreach ($data['parameters']['ignoreErrors'] as $error) {
+foreach ($data['parameters']['ignoreErrors'] as $index => $error) {
     $identifier = $error['identifier'] ?? 'missing-identifier';
+
+    $message = $error['message'] ?? error("Ignored error #$index is missing 'message'");
+    $count = $error['count'] ?? error("Ignored error #$index is missing 'count'");
+    $path = $error['path'] ?? error("Ignored error #$index is missing 'path'");
+
     unset($error['identifier']);
-    $groupedErrors[$identifier][] = $error;
+    $groupedErrors[$identifier][] = [
+        'message' => $message,
+        'count' => $count,
+        'path' => str_replace($folder, '', $path), // __DIR__ got expanded for php
+    ];
 }
 
 ksort($groupedErrors);
 
-$loaderData = [];
+$createdBaselines = [];
 
 foreach ($groupedErrors as $identifier => $errors) {
-    $filePath = $folder . '/' . $identifier . '.neon';
-    $loaderData['includes'][] = $identifier . '.neon';
-    $outputData = ['parameters' => ['ignoreErrors' => $errors]];
+    $filePath = $folder . '/' . $identifier . '.' . $extension;
+    $createdBaselines[] = $identifier . '.' . $extension;
+
     $errorsCount = count($errors);
     $plural = $errorsCount === 1 ? '' : 's';
-    $prefix = "# total $errorsCount error$plural\n\n";
-    $contents = $prefix . NeonHelper::encode($outputData, $indent);
-    file_put_contents($filePath, $contents);
+    $prefix = "total $errorsCount error$plural";
+
+    $encodedData = $handler->encodeBaseline($prefix, $errors, $indent);
+    file_put_contents($filePath, $encodedData);
     echo "Writing baseline file $filePath with $errorsCount errors\n";
 }
 
-file_put_contents($loaderFile, NeonHelper::encode($loaderData, $indent));
+file_put_contents($loaderFile, $handler->encodeBaselineLoader($createdBaselines, $indent));
 echo "Writing baseline loader to $loaderFile\n";
