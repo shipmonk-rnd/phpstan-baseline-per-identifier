@@ -6,6 +6,8 @@
 /.gitattributes export-ignore
 /.github export-ignore
 /.gitignore export-ignore
+/composer-dependency-analyser.php export-ignore
+/loader.neon export-ignore
 /phpcs.xml.dist export-ignore
 /phpstan.neon.dist export-ignore
 /phpunit.xml.dist export-ignore
