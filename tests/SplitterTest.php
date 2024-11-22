@@ -14,10 +14,10 @@ use function sys_get_temp_dir;
 use function uniqid;
 use function var_export;
 
-class BinTest extends TestCase
+class SplitterTest extends TestCase
 {
 
-    public function testNeon(): void
+    public function testBinaryWithNeon(): void
     {
         $fakeRoot = $this->prepareSampleFolder();
         $squashed = $this->getSampleErrors();
@@ -32,7 +32,7 @@ class BinTest extends TestCase
         self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
     }
 
-    public function testPhp(): void
+    public function testBinaryWithPhp(): void
     {
         $fakeRoot = $this->prepareSampleFolder();
         $squashed = $this->getSampleErrors();
@@ -45,6 +45,25 @@ class BinTest extends TestCase
         self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/sample.identifier.php', $fakeRoot . '/baselines/sample.identifier.php');
         self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/another.identifier.php', $fakeRoot . '/baselines/another.identifier.php');
         self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/missing-identifier.php', $fakeRoot . '/baselines/missing-identifier.php');
+    }
+
+    public function testSplitter(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $squashed = $this->getSampleErrors();
+
+        $loaderPath = $folder . '/baselines/loader.neon';
+        file_put_contents($loaderPath, Neon::encode($squashed));
+
+        $splitter = new BaselineSplitter("\t");
+        $written = $splitter->split($loaderPath);
+
+        self::assertSame([
+            $folder . '/baselines/another.identifier.neon' => 1,
+            $folder . '/baselines/missing-identifier.neon' => 1,
+            $folder . '/baselines/sample.identifier.neon' => 1,
+            $folder . '/baselines/loader.neon' => null,
+        ], $written);
     }
 
     private function prepareSampleFolder(): string
