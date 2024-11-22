@@ -56,7 +56,7 @@ try {
 }
 if (!isset($data['parameters']['ignoreErrors'])) {
     error(
-        "Invalid argument, expected neon file with 'parameters.ignoreErrors' key in '$loaderFile'." .
+        "Invalid argument, expected $extension file with 'parameters.ignoreErrors' key in '$loaderFile'." .
         "\n - Did you run native baseline generation first?" .
         "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFile"
     );
