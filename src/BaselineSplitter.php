@@ -5,7 +5,6 @@ namespace ShipMonk\PHPStan\Baseline;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
 use SplFileInfo;
-use function array_keys;
 use function assert;
 use function count;
 use function dirname;
@@ -56,14 +55,16 @@ class BaselineSplitter
 
         $groupedErrors = $this->groupErrorsByIdentifier($ignoredErrors, $folder);
 
-        $createdBaselines = [];
+        $outputInfo = [];
+        $baselineFiles = [];
 
         foreach ($groupedErrors as $identifier => $errors) {
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
             $errorsCount = count($errors);
 
-            $createdBaselines[$fileName] = $errorsCount;
+            $outputInfo[$filePath] = $errorsCount;
+            $baselineFiles[] = $fileName;
 
             $plural = $errorsCount === 1 ? '' : 's';
             $prefix = "total $errorsCount error$plural";
@@ -72,12 +73,12 @@ class BaselineSplitter
             $this->writeFile($filePath, $encodedData);
         }
 
-        $baselineLoaderData = $handler->encodeBaselineLoader(array_keys($createdBaselines), $this->indent);
-        $this->writeFile($loaderFilePath, $baselineLoaderData);
+        $baselineLoaderData = $handler->encodeBaselineLoader($baselineFiles, $this->indent);
+        $this->writeFile($realPath, $baselineLoaderData);
 
-        $createdBaselines[$loaderFilePath] = null;
+        $outputInfo[$realPath] = null;
 
-        return $createdBaselines;
+        return $outputInfo;
     }
 
     /**

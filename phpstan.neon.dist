@@ -40,3 +40,8 @@ parameters:
 
     shipmonkBaselinePerIdentifier:
         directory: %currentWorkingDirectory%
+
+    ignoreErrors:
+        - # allow uncatched exceptions in tests
+            identifier: missingType.checkedException
+            path: tests/*
