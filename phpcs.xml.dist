@@ -277,7 +277,6 @@
     <rule ref="SlevomatCodingStandard.Classes.PropertyDeclaration" />
     <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature"/>
     <rule ref="SlevomatCodingStandard.Classes.TraitUseSpacing" />
-    <rule ref="SlevomatCodingStandard.Classes.DisallowConstructorPropertyPromotion" />
     <rule ref="SlevomatCodingStandard.Commenting.AnnotationName"/>
     <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing">
         <properties>

@@ -10,6 +10,7 @@ includes:
 parameters:
     phpVersion: 80000
     paths:
+        - bin/split-phpstan-baseline
         - src
         - tests
     excludePaths:
