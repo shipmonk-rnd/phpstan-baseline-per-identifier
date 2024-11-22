@@ -32,6 +32,9 @@ composer require --dev shipmonk/phpstan-baseline-per-identifier
 
 ## Usage
 
+> [!IMPORTANT]
+> _This usage is available since version 2.0. See legacy usage below if you are still using PHPStan 1.x_
+
 Setup baselines loader, other files will be placed beside that file:
 ```neon
 # phpstan.neon.dist
@@ -58,6 +61,8 @@ _(optional)_ You can simplify generation with e.g. composer script:
 
 <details>
 <summary><h3>Legacy usage</h3></summary>
+
+> _This usage is deprecated since 2.0, but it works in all versions. Downside is that it cannot utilize result cache_
 
 Setup where your baseline files should be stored and include its loader:
 ```neon
