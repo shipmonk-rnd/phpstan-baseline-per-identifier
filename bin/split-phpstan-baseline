@@ -31,7 +31,7 @@ $providedOptions = getopt('', ['tabs'], $restIndex);
 $args = array_slice($argv, $restIndex);
 
 $loaderFile = $args[0] ?? null;
-$indent = isset($providedOptions['tabs'])
+$indent = isset($providedOptions['tabs']) || in_array('--tabs', $args, true)
     ? "\t"
     : '    ';
 
