@@ -4,8 +4,6 @@
 namespace ShipMonk\PHPStan\Baseline;
 
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
-use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
-use SplFileInfo;
 
 $autoloadFiles = [
     __DIR__ . '/../../../autoload.php',
@@ -28,6 +26,7 @@ function error(string $message): void
     exit(1);
 }
 
+/** @var int $restIndex */
 $providedOptions = getopt('', ['tabs'], $restIndex);
 $args = array_slice($argv, $restIndex);
 
@@ -47,56 +46,14 @@ if (!is_file($loaderFile)) {
     error("Invalid argument, '$loaderFile' is not a file");
 }
 
-$splFile = new SplFileInfo($loaderFile);
-$folder = dirname($splFile->getRealPath());
-$extension = $splFile->getExtension();
-
 try {
-    $handler = HandlerFactory::create($extension);
-    $data = $handler->decodeBaseline($loaderFile);
+    $splitter = new BaselineSplitter($indent);
+    $writtenBaselines = $splitter->split($loaderFile);
+
+    foreach ($writtenBaselines as $writtenBaseline => $errorsCount) {
+        echo "Writing baseline file $writtenBaseline" . ($errorsCount !== null ? " with $errorsCount errors\n" : "\n");
+    }
+
 } catch (ErrorException $e) {
     error($e->getMessage());
 }
-if (!isset($data['parameters']['ignoreErrors'])) {
-    error(
-        "Invalid argument, expected $extension file with 'parameters.ignoreErrors' key in '$loaderFile'." .
-        "\n - Did you run native baseline generation first?" .
-        "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFile"
-    );
-}
-
-$groupedErrors = [];
-foreach ($data['parameters']['ignoreErrors'] as $index => $error) {
-    $identifier = $error['identifier'] ?? 'missing-identifier';
-
-    $message = $error['message'] ?? error("Ignored error #$index is missing 'message'");
-    $count = $error['count'] ?? error("Ignored error #$index is missing 'count'");
-    $path = $error['path'] ?? error("Ignored error #$index is missing 'path'");
-
-    unset($error['identifier']);
-    $groupedErrors[$identifier][] = [
-        'message' => $message,
-        'count' => $count,
-        'path' => str_replace($folder, '', $path), // __DIR__ got expanded for php
-    ];
-}
-
-ksort($groupedErrors);
-
-$createdBaselines = [];
-
-foreach ($groupedErrors as $identifier => $errors) {
-    $filePath = $folder . '/' . $identifier . '.' . $extension;
-    $createdBaselines[] = $identifier . '.' . $extension;
-
-    $errorsCount = count($errors);
-    $plural = $errorsCount === 1 ? '' : 's';
-    $prefix = "total $errorsCount error$plural";
-
-    $encodedData = $handler->encodeBaseline($prefix, $errors, $indent);
-    file_put_contents($filePath, $encodedData);
-    echo "Writing baseline file $filePath with $errorsCount errors\n";
-}
-
-file_put_contents($loaderFile, $handler->encodeBaselineLoader($createdBaselines, $indent));
-echo "Writing baseline loader to $loaderFile\n";

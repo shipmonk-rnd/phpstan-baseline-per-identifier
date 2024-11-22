@@ -8,9 +8,10 @@ interface BaselineHandler
 {
 
     /**
+     * @return array<mixed>
      * @throws ErrorException
      */
-    public function decodeBaseline(string $filepath): mixed;
+    public function decodeBaseline(string $filepath): array;
 
     /**
      * @param list<array{message: string, count: int, path: string}> $errors

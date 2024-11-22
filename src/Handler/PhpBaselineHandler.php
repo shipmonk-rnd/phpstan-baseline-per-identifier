@@ -4,18 +4,27 @@ namespace ShipMonk\PHPStan\Baseline\Handler;
 
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use Throwable;
+use function get_debug_type;
+use function is_array;
 use function sprintf;
 use function var_export;
 
 class PhpBaselineHandler implements BaselineHandler
 {
 
-    public function decodeBaseline(string $filepath): mixed
+    public function decodeBaseline(string $filepath): array
     {
         try {
-            return (static function () use ($filepath): mixed {
+            $decoded = (static function () use ($filepath): mixed {
                 return require $filepath;
             })();
+
+            if (!is_array($decoded)) {
+                throw new ErrorException("File '$filepath' must return array, " . get_debug_type($decoded) . ' given');
+            }
+
+            return $decoded;
+
         } catch (Throwable $e) {
             throw new ErrorException("Error while loading baseline file '$filepath':" . $e->getMessage(), $e);
         }
