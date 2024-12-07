@@ -4,8 +4,8 @@ namespace ShipMonk\PHPStan\Baseline\Handler;
 
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use Throwable;
-use function is_array;
 use function gettype;
+use function is_array;
 use function sprintf;
 use function var_export;
 

@@ -19,6 +19,7 @@ class BaselineSplitter
 {
 
     private string $indent;
+
     public function __construct(string $indent)
     {
         $this->indent = $indent;
@@ -96,17 +97,23 @@ class BaselineSplitter
             }
 
             $identifier = $error['identifier'] ?? 'missing-identifier';
+
             if (!isset($error['message'])) {
                 throw new ErrorException("Ignored error #$index is missing 'message'");
             }
+
             $message = $error['message'];
+
             if (!isset($error['count'])) {
                 throw new ErrorException("Ignored error #$index is missing 'count'");
             }
+
             $count = $error['count'];
+
             if (!isset($error['path'])) {
                 throw new ErrorException("Ignored error #$index is missing 'path'");
             }
+
             $path = $error['path'];
 
             assert(is_string($identifier));
