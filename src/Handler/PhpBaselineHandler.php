@@ -15,7 +15,7 @@ class PhpBaselineHandler implements BaselineHandler
     public function decodeBaseline(string $filepath): array
     {
         try {
-            $decoded = (static function () use ($filepath): mixed {
+            $decoded = (static function () use ($filepath) {
                 return require $filepath;
             })();
 
