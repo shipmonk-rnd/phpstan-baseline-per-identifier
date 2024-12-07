@@ -130,7 +130,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         $toParts = explode(DIRECTORY_SEPARATOR, $to);
 
         // Find the common base path
-        while (count($fromParts) > 0 && count($toParts) > 0 && ($fromParts[0] === $toParts[0])) {
+        while ($fromParts !== [] && $toParts !== [] && ($fromParts[0] === $toParts[0])) {
             array_shift($fromParts);
             array_shift($toParts);
         }

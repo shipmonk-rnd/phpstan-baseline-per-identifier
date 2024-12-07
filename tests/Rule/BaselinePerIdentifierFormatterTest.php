@@ -10,7 +10,7 @@ use function mkdir;
 use function sys_get_temp_dir;
 use function uniqid;
 
-class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
+final class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
 {
 
     public function testFormat(): void
