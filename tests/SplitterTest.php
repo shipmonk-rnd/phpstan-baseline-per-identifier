@@ -14,7 +14,7 @@ use function sys_get_temp_dir;
 use function uniqid;
 use function var_export;
 
-class SplitterTest extends TestCase
+final class SplitterTest extends TestCase
 {
 
     public function testBinaryWithNeon(): void

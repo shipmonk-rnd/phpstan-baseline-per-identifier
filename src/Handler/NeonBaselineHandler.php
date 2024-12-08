@@ -6,7 +6,7 @@ use Nette\Neon\Exception as NeonException;
 use Nette\Neon\Neon;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use ShipMonk\PHPStan\Baseline\NeonHelper;
-use function get_debug_type;
+use function gettype;
 use function is_array;
 
 class NeonBaselineHandler implements BaselineHandler
@@ -19,7 +19,7 @@ class NeonBaselineHandler implements BaselineHandler
             $decoded = Neon::decodeFile($filepath);
 
             if (!is_array($decoded)) {
-                throw new ErrorException('Invalid neon file: root must be an array, ' . get_debug_type($decoded) . ' given');
+                throw new ErrorException('Invalid neon file: root must be an array, ' . gettype($decoded) . ' given');
             }
 
             return $decoded;

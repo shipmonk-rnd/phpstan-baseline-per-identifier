@@ -18,10 +18,11 @@ use function str_replace;
 class BaselineSplitter
 {
 
-    public function __construct(
-        private string $indent
-    )
+    private string $indent;
+
+    public function __construct(string $indent)
     {
+        $this->indent = $indent;
     }
 
     /**
@@ -97,9 +98,23 @@ class BaselineSplitter
 
             $identifier = $error['identifier'] ?? 'missing-identifier';
 
-            $message = $error['message'] ?? throw new ErrorException("Ignored error #$index is missing 'message'");
-            $count = $error['count'] ?? throw new ErrorException("Ignored error #$index is missing 'count'");
-            $path = $error['path'] ?? throw new ErrorException("Ignored error #$index is missing 'path'");
+            if (!isset($error['message'])) {
+                throw new ErrorException("Ignored error #$index is missing 'message'");
+            }
+
+            $message = $error['message'];
+
+            if (!isset($error['count'])) {
+                throw new ErrorException("Ignored error #$index is missing 'count'");
+            }
+
+            $count = $error['count'];
+
+            if (!isset($error['path'])) {
+                throw new ErrorException("Ignored error #$index is missing 'path'");
+            }
+
+            $path = $error['path'];
 
             assert(is_string($identifier));
             assert(is_string($message));
