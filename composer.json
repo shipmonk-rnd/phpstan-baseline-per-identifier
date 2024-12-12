@@ -1,6 +1,6 @@
 {
     "name": "shipmonk/phpstan-baseline-per-identifier",
-    "description": "Error formatter for PHPStan that generates baseline files per each error identifier",
+    "description": "Split your PHPStan baseline into multiple files, one per error identifier. Supports both neon baseline and PHP baseline.",
     "license": [
         "MIT"
     ],
