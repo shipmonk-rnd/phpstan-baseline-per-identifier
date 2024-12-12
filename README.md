@@ -52,8 +52,8 @@ _(optional)_ You can simplify generation with e.g. composer script:
 {
     "scripts": {
         "generate:baseline:phpstan": [
-            "@phpstan --generate-baseline=baselines/loader.neon",
-            "@split-phpstan-baseline baselines/loader.neon"
+            "phpstan --generate-baseline=baselines/loader.neon",
+            "split-phpstan-baseline baselines/loader.neon"
         ]
     }
 }
@@ -85,7 +85,7 @@ Prepare composer script to simplify generation:
         "generate:baseline:phpstan": [
             "rm baselines/*.neon",
             "touch baselines/loader.neon",
-            "@phpstan analyse --error-format baselinePerIdentifier"
+            "phpstan analyse --error-format baselinePerIdentifier"
         ]
     }
 }
