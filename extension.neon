@@ -7,10 +7,11 @@ services:
 
 parameters:
     shipmonkBaselinePerIdentifier:
+        directory: null
         indent: '    '
 
 parametersSchema:
     shipmonkBaselinePerIdentifier: structure([
-        directory: string()
+        directory: schema(string(), nullable())
         indent: string()
     ])
