@@ -12,6 +12,6 @@ parameters:
 
 parametersSchema:
     shipmonkBaselinePerIdentifier: structure([
-        directory: string()
+        directory: schema(string(), nullable())
         indent: string()
     ])
