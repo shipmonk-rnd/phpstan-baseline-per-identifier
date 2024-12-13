@@ -7,7 +7,7 @@ services:
 
 parameters:
     shipmonkBaselinePerIdentifier:
-        directory: %currentWorkingDirectory%/baselines
+        directory: null
         indent: '    '
 
 parametersSchema:
