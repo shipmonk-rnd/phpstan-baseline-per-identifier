@@ -32,7 +32,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
     public function __construct(?string $baselinesDir, string $indent)
     {
         if ($baselinesDir === null) {
-            throw new LogicException('Baselines directory must be set, please set up \'parameters.shipmonkBaselinePerIdentifier.directory\' in your phpstan.neon.dist');
+            throw new LogicException('Baselines directory must be set, please set up \'parameters.shipmonkBaselinePerIdentifier.directory\' in your phpstan configuration file');
         }
 
         $baselinesRealDir = realpath($baselinesDir);
