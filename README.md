@@ -35,16 +35,22 @@ composer require --dev shipmonk/phpstan-baseline-per-identifier
 > [!IMPORTANT]
 > _This usage is available since version 2.0. See legacy usage below if you are still using PHPStan 1.x_
 
-Setup baselines loader, other files will be placed beside that file:
+Remove old single baseline include:
+```diff
+-includes:
+-	- phpstan-baseline.neon
+```
+
+Run native baseline generation and split it into multiple files via our script (other baseline files will be placed beside the loader):
+```sh
+vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon
+```
+
+Setup the baselines loader:
 ```neon
 # phpstan.neon.dist
 includes:
-    - baselines/loader.neon # instead of traditional phpstan-baseline.neon
-```
-
-Run native baseline generation and split it into multiple files via our script:
-```sh
-vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon
+    - baselines/loader.neon
 ```
 
 _(optional)_ You can simplify generation with e.g. composer script:
@@ -98,11 +104,4 @@ Prepare composer script to simplify generation:
 
 ## PHP Baseline
 - If the loader file extension is php, the generated files will be php files as well
-
-## Migrating from single baseline
-
-1. `rm phpstan-baseline.neon` (and remove its include from `phpstan.neon.dist`)
-2. `mkdir baselines`
-3. `touch baselines/loader.neon`  (and include it in `phpstan.neon.dist`)
-4. Run the split script from above
 
