@@ -41,7 +41,7 @@ class PhpBaselineHandler implements BaselineHandler
                 "\$ignoreErrors[] = [\n{$indent}'message' => %s,\n{$indent}'count' => %d,\n{$indent}'path' => __DIR__ . %s,\n];\n",
                 var_export($error['message'], true),
                 var_export($error['count'], true),
-                var_export($error['path'], true),
+                var_export('/' . $error['path'], true),
             );
         }
 
