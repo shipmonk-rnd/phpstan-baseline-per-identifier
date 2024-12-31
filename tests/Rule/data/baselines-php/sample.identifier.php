@@ -6,7 +6,7 @@ $ignoreErrors = [];
 $ignoreErrors[] = [
     'message' => '#^Error simple$#',
     'count' => 1,
-    'path' => __DIR__ . '../app/file.php',
+    'path' => __DIR__ . '/../app/file.php',
 ];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
