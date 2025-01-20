@@ -73,6 +73,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
         foreach ($fileErrors as $identifier => $errors) {
             $errorsToOutput = [];
+            $errorsCount = 0;
 
             foreach ($errors as $file => $errorMessages) {
                 $fileErrorsCounts = [];
@@ -94,12 +95,12 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
                         'count' => $count,
                         'path' => NeonHelper::escape($file),
                     ];
+                    $errorsCount += $count;
                 }
             }
 
             $includes[] = $identifier . '.neon';
             $baselineFilePath = $this->baselinesDir . '/' . $identifier . '.neon';
-            $errorsCount = count($errorsToOutput);
 
             $output->writeLineFormatted(sprintf('Writing baseline file %s with %d errors', $baselineFilePath, $errorsCount));
 

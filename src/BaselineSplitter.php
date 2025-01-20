@@ -5,8 +5,8 @@ namespace ShipMonk\PHPStan\Baseline;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
 use SplFileInfo;
+use function array_reduce;
 use function assert;
-use function count;
 use function dirname;
 use function file_put_contents;
 use function is_array;
@@ -62,7 +62,7 @@ class BaselineSplitter
         foreach ($groupedErrors as $identifier => $errors) {
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
-            $errorsCount = count($errors);
+            $errorsCount = array_reduce($errors, static fn(int $carry, array $item): int => $carry + $item['count'], 0);
 
             $outputInfo[$filePath] = $errorsCount;
             $baselineFiles[] = $fileName;
