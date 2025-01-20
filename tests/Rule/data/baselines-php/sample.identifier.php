@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-// total 1 error
+// total 2 errors
 
 $ignoreErrors = [];
 $ignoreErrors[] = [
     'message' => '#^Error simple$#',
-    'count' => 1,
+    'count' => 2,
     'path' => __DIR__ . '/../app/file.php',
 ];
 

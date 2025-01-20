@@ -61,7 +61,7 @@ final class SplitterTest extends TestCase
         self::assertSame([
             $folder . '/baselines/another.identifier.neon' => 1,
             $folder . '/baselines/missing-identifier.neon' => 1,
-            $folder . '/baselines/sample.identifier.neon' => 1,
+            $folder . '/baselines/sample.identifier.neon' => 2,
             $folder . '/baselines/loader.neon' => null,
         ], $written);
     }
@@ -84,7 +84,7 @@ final class SplitterTest extends TestCase
                 'ignoreErrors' => [
                     [
                         'message' => '#^Error simple$#',
-                        'count' => 1,
+                        'count' => 2,
                         'path' => '../app/file.php',
                         'identifier' => 'sample.identifier',
                     ],

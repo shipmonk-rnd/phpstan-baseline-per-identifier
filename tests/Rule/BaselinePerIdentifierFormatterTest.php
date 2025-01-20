@@ -24,6 +24,7 @@ final class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
             $this->createAnalysisResult(
                 [
                     (new Error('Error simple', $fakeRoot . '/app/file.php', 1))->withIdentifier('sample.identifier'), // @phpstan-ignore phpstanApi.constructor
+                    (new Error('Error simple', $fakeRoot . '/app/file.php', 5))->withIdentifier('sample.identifier'), // @phpstan-ignore phpstanApi.constructor
                     (new Error('Error to escape \'#', $fakeRoot . '/app/config.php', 2))->withIdentifier('another.identifier'), // @phpstan-ignore phpstanApi.constructor
                     (new Error('Error 3', $fakeRoot . '/app/index.php', 3)), // @phpstan-ignore phpstanApi.constructor
                 ],
