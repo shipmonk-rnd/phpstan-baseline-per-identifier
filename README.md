@@ -59,6 +59,7 @@ _(optional)_ You can simplify generation with e.g. composer script:
     "scripts": {
         "generate:baseline:phpstan": [
             "phpstan --generate-baseline=baselines/loader.neon",
+            "find baselines/ -type f -not -name loader.neon -delete",
             "split-phpstan-baseline baselines/loader.neon"
         ]
     }
