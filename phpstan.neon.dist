@@ -15,6 +15,7 @@ parameters:
         - tests
     excludePaths:
         analyseAndScan:
+            - tests/Integration/src
             - tests/*/data/*
     tmpDir: cache/phpstan/
     checkMissingCallableSignature: true

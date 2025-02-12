@@ -1,0 +1,8 @@
+parameters:
+    level: max
+    tmpDir: ../../cache/integration-test/phpstan-cache-php
+    paths:
+        - src
+
+includes:
+    - ../../cache/integration-test/baselines/loader.php
