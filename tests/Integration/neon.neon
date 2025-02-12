@@ -1,0 +1,8 @@
+parameters:
+    level: max
+    tmpDir: ../../cache/integration-test/phpstan-cache-neon
+    paths:
+        - src
+
+includes:
+    - ../../cache/integration-test/baselines/loader.neon
