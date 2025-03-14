@@ -24,6 +24,7 @@
         "phpstan/phpstan-strict-rules": "2.0.0",
         "phpunit/phpunit": "9.6.20",
         "shipmonk/composer-dependency-analyser": "1.7",
+        "shipmonk/dead-code-detector": "^0.9.2",
         "shipmonk/name-collision-detector": "2.1.1",
         "shipmonk/phpstan-rules": "4.0.0",
         "slevomat/coding-standard": "8.15.0"
