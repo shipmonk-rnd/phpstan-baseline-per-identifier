@@ -70,6 +70,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         ksort($fileErrors, SORT_STRING);
 
         $includes = [];
+        $totalErrorsCount = 0;
 
         foreach ($fileErrors as $identifier => $errors) {
             $errorsToOutput = [];
@@ -102,6 +103,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
             $includes[] = $identifier . '.neon';
             $baselineFilePath = $this->baselinesDir . '/' . $identifier . '.neon';
 
+            $totalErrorsCount += $errorsCount;
             $output->writeLineFormatted(sprintf('Writing baseline file %s with %d errors', $baselineFilePath, $errorsCount));
 
             $plurality = $errorsCount === 1 ? '' : 's';
@@ -114,7 +116,9 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
             }
         }
 
-        $writtenLoader = file_put_contents($this->baselinesDir . '/loader.neon', NeonHelper::encode(['includes' => $includes], $this->indent));
+        $plurality = $totalErrorsCount === 1 ? '' : 's';
+        $prefix = "# total $totalErrorsCount error$plurality\n";
+        $writtenLoader = file_put_contents($this->baselinesDir . '/loader.neon', $prefix . NeonHelper::encode(['includes' => $includes], $this->indent));
 
         if ($writtenLoader === false) {
             throw new LogicException('Error while writing to ' . $this->baselinesDir . '/loader.neon');

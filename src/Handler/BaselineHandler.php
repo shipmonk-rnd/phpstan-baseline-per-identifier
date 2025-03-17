@@ -21,6 +21,6 @@ interface BaselineHandler
     /**
      * @param list<string> $filePaths
      */
-    public function encodeBaselineLoader(array $filePaths, string $indent): string;
+    public function encodeBaselineLoader(string $comment, array $filePaths, string $indent): string;
 
 }

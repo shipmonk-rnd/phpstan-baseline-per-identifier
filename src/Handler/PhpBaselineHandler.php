@@ -52,9 +52,10 @@ class PhpBaselineHandler implements BaselineHandler
         return $php;
     }
 
-    public function encodeBaselineLoader(array $filePaths, string $indent): string
+    public function encodeBaselineLoader(string $comment, array $filePaths, string $indent): string
     {
         $php = "<?php declare(strict_types = 1);\n\n";
+        $php .= "// $comment\n";
         $php .= "return ['includes' => [\n";
 
         foreach ($filePaths as $filePath) {

@@ -58,11 +58,13 @@ class BaselineSplitter
 
         $outputInfo = [];
         $baselineFiles = [];
+        $totalErrorCount = 0;
 
         foreach ($groupedErrors as $identifier => $errors) {
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
             $errorsCount = array_reduce($errors, static fn(int $carry, array $item): int => $carry + $item['count'], 0);
+            $totalErrorCount += $errorsCount;
 
             $outputInfo[$filePath] = $errorsCount;
             $baselineFiles[] = $fileName;
@@ -74,7 +76,9 @@ class BaselineSplitter
             $this->writeFile($filePath, $encodedData);
         }
 
-        $baselineLoaderData = $handler->encodeBaselineLoader($baselineFiles, $this->indent);
+        $plural = $totalErrorCount === 1 ? '' : 's';
+        $prefix = "total $totalErrorCount error$plural";
+        $baselineLoaderData = $handler->encodeBaselineLoader($prefix, $baselineFiles, $this->indent);
         $this->writeFile($realPath, $baselineLoaderData);
 
         $outputInfo[$realPath] = null;
