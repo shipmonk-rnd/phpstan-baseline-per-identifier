@@ -35,9 +35,10 @@ class NeonBaselineHandler implements BaselineHandler
         return $prefix . NeonHelper::encode(['parameters' => ['ignoreErrors' => $errors]], $indent);
     }
 
-    public function encodeBaselineLoader(array $filePaths, string $indent): string
+    public function encodeBaselineLoader(string $comment, array $filePaths, string $indent): string
     {
-        return NeonHelper::encode(['includes' => $filePaths], $indent);
+        $prefix = "# $comment\n";
+        return $prefix . NeonHelper::encode(['includes' => $filePaths], $indent);
     }
 
 }
