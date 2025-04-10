@@ -27,13 +27,14 @@ function error(string $message): void
 }
 
 /** @var int $restIndex */
-$providedOptions = getopt('', ['tabs'], $restIndex);
+$providedOptions = getopt('', ['tabs', 'no-error-count'], $restIndex);
 $args = array_slice($argv, $restIndex);
 
 $loaderFile = $args[0] ?? null;
 $indent = isset($providedOptions['tabs']) || in_array('--tabs', $args, true)
     ? "\t"
     : '    ';
+$includeCount = !(isset($providedOptions['no-error-count']) || in_array('--no-error-count', $args, true));
 
 if ($loaderFile === null) {
     error(
@@ -47,7 +48,7 @@ if (!is_file($loaderFile)) {
 }
 
 try {
-    $splitter = new BaselineSplitter($indent);
+    $splitter = new BaselineSplitter($indent, $includeCount);
     $writtenBaselines = $splitter->split($loaderFile);
 
     foreach ($writtenBaselines as $writtenBaseline => $errorsCount) {
