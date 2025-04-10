@@ -50,7 +50,7 @@ final class SplitterTest extends BinTestCase
         $loaderPath = $folder . '/baselines/loader.neon';
         file_put_contents($loaderPath, Neon::encode($squashed));
 
-        $splitter = new BaselineSplitter("\t");
+        $splitter = new BaselineSplitter("\t", true);
         $written = $splitter->split($loaderPath);
 
         self::assertSame([

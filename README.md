@@ -102,6 +102,7 @@ Prepare composer script to simplify generation:
 
 ## Cli options
 - ``--tabs`` to use tabs as indents in generated neon files
+- ``--no-error-count`` to remove errors count in generated files
 
 ## PHP Baseline
 - If the loader file extension is php, the generated files will be php files as well

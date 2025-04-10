@@ -20,9 +20,12 @@ class BaselineSplitter
 
     private string $indent;
 
-    public function __construct(string $indent)
+    private bool $includeCount;
+
+    public function __construct(string $indent, bool $includeCount)
     {
         $this->indent = $indent;
+        $this->includeCount = $includeCount;
     }
 
     /**
@@ -70,14 +73,14 @@ class BaselineSplitter
             $baselineFiles[] = $fileName;
 
             $plural = $errorsCount === 1 ? '' : 's';
-            $prefix = "total $errorsCount error$plural";
+            $prefix = $this->includeCount ? "total $errorsCount error$plural" : null;
 
             $encodedData = $handler->encodeBaseline($prefix, $errors, $this->indent);
             $this->writeFile($filePath, $encodedData);
         }
 
         $plural = $totalErrorCount === 1 ? '' : 's';
-        $prefix = "total $totalErrorCount error$plural";
+        $prefix = $this->includeCount ? "total $totalErrorCount error$plural" : null;
         $baselineLoaderData = $handler->encodeBaselineLoader($prefix, $baselineFiles, $this->indent);
         $this->writeFile($realPath, $baselineLoaderData);
 

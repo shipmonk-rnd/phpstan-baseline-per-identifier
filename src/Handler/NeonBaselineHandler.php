@@ -29,15 +29,15 @@ class NeonBaselineHandler implements BaselineHandler
         }
     }
 
-    public function encodeBaseline(string $comment, array $errors, string $indent): string
+    public function encodeBaseline(?string $comment, array $errors, string $indent): string
     {
-        $prefix = "# $comment\n\n";
+        $prefix = $comment !== null ? "# $comment\n\n" : '';
         return $prefix . NeonHelper::encode(['parameters' => ['ignoreErrors' => $errors]], $indent);
     }
 
-    public function encodeBaselineLoader(string $comment, array $filePaths, string $indent): string
+    public function encodeBaselineLoader(?string $comment, array $filePaths, string $indent): string
     {
-        $prefix = "# $comment\n";
+        $prefix = $comment !== null ? "# $comment\n" : '';
         return $prefix . NeonHelper::encode(['includes' => $filePaths], $indent);
     }
 
