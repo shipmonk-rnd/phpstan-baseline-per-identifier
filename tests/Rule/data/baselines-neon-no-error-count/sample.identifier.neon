@@ -1,0 +1,6 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error simple$#'
+            count: 2
+            path: ../app/file.php

@@ -42,6 +42,36 @@ final class SplitterTest extends BinTestCase
         self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php/missing-identifier.php', $fakeRoot . '/baselines/missing-identifier.php');
     }
 
+    public function testBinaryWithNeonNoErrorCount(): void
+    {
+        $fakeRoot = $this->prepareSampleFolder();
+        $squashed = $this->getSampleErrors();
+
+        file_put_contents($fakeRoot . '/baselines/loader.neon', Neon::encode($squashed));
+
+        $this->runCommand('php bin/split-phpstan-baseline ' . $fakeRoot . '/baselines/loader.neon --no-error-count', __DIR__ . '/..', 0);
+
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon-no-error-count/loader.neon', $fakeRoot . '/baselines/loader.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon-no-error-count/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon-no-error-count/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-neon-no-error-count/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
+    }
+
+    public function testBinaryWithPhpNoErrorCount(): void
+    {
+        $fakeRoot = $this->prepareSampleFolder();
+        $squashed = $this->getSampleErrors();
+
+        file_put_contents($fakeRoot . '/baselines/loader.php', '<?php return ' . var_export($squashed, true) . ';');
+
+        $this->runCommand('php bin/split-phpstan-baseline ' . $fakeRoot . '/baselines/loader.php --no-error-count', __DIR__ . '/..', 0);
+
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php-no-error-count/loader.php', $fakeRoot . '/baselines/loader.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php-no-error-count/sample.identifier.php', $fakeRoot . '/baselines/sample.identifier.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php-no-error-count/another.identifier.php', $fakeRoot . '/baselines/another.identifier.php');
+        self::assertFileEquals(__DIR__ . '/Rule/data/baselines-php-no-error-count/missing-identifier.php', $fakeRoot . '/baselines/missing-identifier.php');
+    }
+
     public function testSplitter(): void
     {
         $folder = $this->prepareSampleFolder();
