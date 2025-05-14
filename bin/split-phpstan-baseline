@@ -26,7 +26,6 @@ function error(string $message): void
     exit(1);
 }
 
-/** @var int $restIndex */
 $providedOptions = getopt('', ['tabs', 'no-error-count'], $restIndex);
 $args = array_slice($argv, $restIndex);
 
