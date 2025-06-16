@@ -22,7 +22,10 @@ class BaselineSplitter
 
     private bool $includeCount;
 
-    public function __construct(string $indent, bool $includeCount)
+    public function __construct(
+        string $indent,
+        bool $includeCount
+    )
     {
         $this->indent = $indent;
         $this->includeCount = $includeCount;
@@ -30,6 +33,7 @@ class BaselineSplitter
 
     /**
      * @return array<string, int|null>
+     *
      * @throws ErrorException
      */
     public function split(string $loaderFilePath): array
@@ -66,7 +70,7 @@ class BaselineSplitter
         foreach ($groupedErrors as $identifier => $errors) {
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
-            $errorsCount = array_reduce($errors, static fn(int $carry, array $item): int => $carry + $item['count'], 0);
+            $errorsCount = array_reduce($errors, static fn (int $carry, array $item): int => $carry + $item['count'], 0);
             $totalErrorCount += $errorsCount;
 
             $outputInfo[$filePath] = $errorsCount;
@@ -92,9 +96,13 @@ class BaselineSplitter
     /**
      * @param array<mixed> $errors
      * @return array<string, list<array{message: string, count: int, path: string}>>
+     *
      * @throws ErrorException
      */
-    private function groupErrorsByIdentifier(array $errors, string $folder): array
+    private function groupErrorsByIdentifier(
+        array $errors,
+        string $folder
+    ): array
     {
         $groupedErrors = [];
 
@@ -147,7 +155,10 @@ class BaselineSplitter
     /**
      * @throws ErrorException
      */
-    private function writeFile(string $filePath, string $contents): void
+    private function writeFile(
+        string $filePath,
+        string $contents
+    ): void
     {
         $written = file_put_contents($filePath, $contents);
 

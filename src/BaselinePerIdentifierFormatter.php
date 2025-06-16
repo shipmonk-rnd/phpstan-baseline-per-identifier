@@ -29,7 +29,10 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
     private string $indent;
 
-    public function __construct(?string $baselinesDir, string $indent)
+    public function __construct(
+        ?string $baselinesDir,
+        string $indent
+    )
     {
         if ($baselinesDir === null) {
             throw new LogicException('Baselines directory must be set, please set up \'parameters.shipmonkBaselinePerIdentifier.directory\' in your phpstan configuration file');
@@ -133,7 +136,10 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         return 0;
     }
 
-    private function getPathDifference(string $from, string $to): string
+    private function getPathDifference(
+        string $from,
+        string $to
+    ): string
     {
         $fromParts = explode(DIRECTORY_SEPARATOR, $from);
         $toParts = explode(DIRECTORY_SEPARATOR, $to);
