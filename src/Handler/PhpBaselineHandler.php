@@ -15,7 +15,7 @@ class PhpBaselineHandler implements BaselineHandler
     public function decodeBaseline(string $filepath): array
     {
         try {
-            $decoded = (static fn() => require $filepath)();
+            $decoded = (static fn () => require $filepath)();
 
             if (!is_array($decoded)) {
                 throw new ErrorException("File '$filepath' must return array, " . gettype($decoded) . ' given');
@@ -28,7 +28,11 @@ class PhpBaselineHandler implements BaselineHandler
         }
     }
 
-    public function encodeBaseline(?string $comment, array $errors, string $indent): string
+    public function encodeBaseline(
+        ?string $comment,
+        array $errors,
+        string $indent
+    ): string
     {
         $php = '<?php declare(strict_types = 1);';
 
@@ -56,7 +60,11 @@ class PhpBaselineHandler implements BaselineHandler
         return $php;
     }
 
-    public function encodeBaselineLoader(?string $comment, array $filePaths, string $indent): string
+    public function encodeBaselineLoader(
+        ?string $comment,
+        array $filePaths,
+        string $indent
+    ): string
     {
         $php = "<?php declare(strict_types = 1);\n\n";
 
