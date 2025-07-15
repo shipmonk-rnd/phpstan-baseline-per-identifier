@@ -120,7 +120,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         }
 
         $plurality = $totalErrorsCount === 1 ? '' : 's';
-        $prefix = "# total $totalErrorsCount error$plurality\n";
+        $prefix = "# total $totalErrorsCount error$plurality\n\n";
         $writtenLoader = file_put_contents($this->baselinesDir . '/loader.neon', $prefix . NeonHelper::encode(['includes' => $includes], $this->indent));
 
         if ($writtenLoader === false) {
