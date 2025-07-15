@@ -7,6 +7,7 @@ use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
 use PHPStan\Testing\PHPStanTestCase;
 use function mkdir;
+use function realpath;
 use function sys_get_temp_dir;
 use function uniqid;
 
@@ -15,7 +16,7 @@ final class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
 
     public function testFormat(): void
     {
-        $fakeRoot = sys_get_temp_dir() . '/' . uniqid('root');
+        $fakeRoot = realpath(sys_get_temp_dir()) . '/' . uniqid('root');
         @mkdir($fakeRoot . '/baselines', 0777, true);
 
         $formatter = new BaselinePerIdentifierFormatter($fakeRoot . '/baselines', '    ');
