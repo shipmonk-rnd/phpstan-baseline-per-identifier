@@ -94,7 +94,10 @@ final class SplitterTest extends BinTestCase
 
     private function prepareSampleFolder(): string
     {
-        $folder = realpath(sys_get_temp_dir()) . '/' . uniqid('split');
+        $folder = realpath(sys_get_temp_dir());
+        self::assertNotFalse($folder);
+
+        $folder = $folder . '/' . uniqid('split');
         @mkdir($folder . '/baselines', 0777, true);
 
         return $folder;

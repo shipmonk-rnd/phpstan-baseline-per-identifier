@@ -16,7 +16,10 @@ final class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
 
     public function testFormat(): void
     {
-        $fakeRoot = realpath(sys_get_temp_dir()) . '/' . uniqid('root');
+        $fakeRoot = realpath(sys_get_temp_dir());
+        self::assertNotFalse($fakeRoot);
+
+        $fakeRoot = $fakeRoot . '/' . uniqid('root');
         @mkdir($fakeRoot . '/baselines', 0777, true);
 
         $formatter = new BaselinePerIdentifierFormatter($fakeRoot . '/baselines', '    ');
