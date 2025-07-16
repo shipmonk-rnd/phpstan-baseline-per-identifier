@@ -45,7 +45,7 @@ class NeonBaselineHandler implements BaselineHandler
         string $indent
     ): string
     {
-        $prefix = $comment !== null ? "# $comment\n" : '';
+        $prefix = $comment !== null ? "# $comment\n\n" : '';
         return $prefix . NeonHelper::encode(['includes' => $filePaths], $indent);
     }
 

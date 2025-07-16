@@ -69,7 +69,7 @@ class PhpBaselineHandler implements BaselineHandler
         $php = "<?php declare(strict_types = 1);\n\n";
 
         if ($comment !== null) {
-            $php .= "// $comment\n";
+            $php .= "// $comment\n\n";
         }
 
         $php .= "return ['includes' => [\n";
