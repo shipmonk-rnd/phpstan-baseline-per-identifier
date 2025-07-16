@@ -5,6 +5,7 @@ namespace ShipMonk\PHPStan\Baseline;
 use Nette\Neon\Neon;
 use function file_put_contents;
 use function mkdir;
+use function realpath;
 use function sys_get_temp_dir;
 use function uniqid;
 use function var_export;
@@ -93,7 +94,10 @@ final class SplitterTest extends BinTestCase
 
     private function prepareSampleFolder(): string
     {
-        $folder = sys_get_temp_dir() . '/' . uniqid('split');
+        $folder = realpath(sys_get_temp_dir());
+        self::assertNotFalse($folder);
+
+        $folder = $folder . '/' . uniqid('split');
         @mkdir($folder . '/baselines', 0777, true);
 
         return $folder;
