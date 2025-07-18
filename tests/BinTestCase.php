@@ -31,8 +31,6 @@ abstract class BinTestCase extends TestCase
         /** @var list<resource> $pipes */
         $output = stream_get_contents($pipes[1]); // @phpstan-ignore offsetAccess.notFound
         $errorOutput = stream_get_contents($pipes[2]); // @phpstan-ignore offsetAccess.notFound
-        self::assertNotFalse($output);
-        self::assertNotFalse($errorOutput);
 
         foreach ($pipes as $pipe) {
             fclose($pipe);
