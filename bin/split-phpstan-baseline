@@ -38,7 +38,7 @@ $includeCount = !(isset($providedOptions['no-error-count']) || in_array('--no-er
 if ($loaderFile === null) {
     error(
         "Missing argument. Usage:\n".
-        " vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon"
+        " vendor/bin/phpstan --generate-baseline=baselines/_loader.neon && vendor/bin/split-phpstan-baseline baselines/_loader.neon"
     );
 }
 
