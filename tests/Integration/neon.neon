@@ -5,4 +5,4 @@ parameters:
         - src
 
 includes:
-    - ../../cache/integration-test/baselines/loader.neon
+    - ../../cache/integration-test/baselines/_loader.neon

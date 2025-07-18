@@ -28,15 +28,15 @@ final class IntegrationTest extends BinTestCase
         array_map('unlink', glob($baselinesDirAbs . '/*')); // @phpstan-ignore argument.type
 
         // ensure dummy loader is present
-        file_put_contents($baselinesDirAbs . "/loader.$extension", $emptyConfig);
+        file_put_contents($baselinesDirAbs . "/_loader.$extension", $emptyConfig);
 
         $cwd = __DIR__;
         $phpstan = '../../vendor/bin/phpstan';
         $split = '../../bin/split-phpstan-baseline';
 
         $this->runCommand("$phpstan clear-result-cache -c $extension.neon", $cwd, 0);
-        $this->runCommand("$phpstan analyse -vv -c $extension.neon --generate-baseline=../../$baselinesDir/loader.$extension", $cwd, 0, null, 'Result cache is saved.');
-        $this->runCommand("php $split ../../$baselinesDir/loader.$extension", $cwd, 0, 'Writing baseline file');
+        $this->runCommand("$phpstan analyse -vv -c $extension.neon --generate-baseline=../../$baselinesDir/_loader.$extension", $cwd, 0, null, 'Result cache is saved.');
+        $this->runCommand("php $split ../../$baselinesDir/_loader.$extension", $cwd, 0, 'Writing baseline file');
         $this->runCommand("$phpstan analyse -vv -c $extension.neon", $cwd, 0, null, 'Result cache restored. 0 files will be reanalysed.');
 
         // cache should invalidate by editing the baseline

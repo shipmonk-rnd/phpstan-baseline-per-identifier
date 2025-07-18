@@ -4,7 +4,7 @@ Split your [PHPStan baseline](https://phpstan.org/user-guide/baseline) into mult
 
 ```txt
 baselines/
- ├─ loader.neon
+ ├─ _loader.neon
  ├─ empty.notAllowed.neon
  ├─ foreach.nonIterable.neon
  ├─ identical.alwaysFalse.neon
@@ -43,14 +43,14 @@ Remove old single baseline include:
 
 Run native baseline generation and split it into multiple files via our script (other baseline files will be placed beside the loader):
 ```sh
-vendor/bin/phpstan --generate-baseline=baselines/loader.neon && vendor/bin/split-phpstan-baseline baselines/loader.neon
+vendor/bin/phpstan --generate-baseline=baselines/_loader.neon && vendor/bin/split-phpstan-baseline baselines/_loader.neon
 ```
 
 Setup the baselines loader:
 ```neon
 # phpstan.neon.dist
 includes:
-    - baselines/loader.neon
+    - baselines/_loader.neon
 ```
 
 _(optional)_ You can simplify generation with e.g. composer script:
@@ -58,9 +58,9 @@ _(optional)_ You can simplify generation with e.g. composer script:
 {
     "scripts": {
         "generate:baseline:phpstan": [
-            "phpstan --generate-baseline=baselines/loader.neon",
-            "find baselines/ -type f -not -name loader.neon -delete",
-            "split-phpstan-baseline baselines/loader.neon"
+            "phpstan --generate-baseline=baselines/_loader.neon",
+            "find baselines/ -type f -not -name _loader.neon -delete",
+            "split-phpstan-baseline baselines/_loader.neon"
         ]
     }
 }
