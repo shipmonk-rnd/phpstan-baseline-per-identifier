@@ -36,6 +36,9 @@ abstract class BinTestCase extends TestCase
             fclose($pipe);
         }
 
+        self::assertNotFalse($output);
+        self::assertNotFalse($errorOutput);
+
         $extraInfo = "Output was:\n" . $output . "\nError was:\n" . $errorOutput . "\n";
 
         if ($expectedOutputContains !== null) {
