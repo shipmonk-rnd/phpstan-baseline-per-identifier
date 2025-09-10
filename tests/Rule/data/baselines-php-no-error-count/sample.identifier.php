@@ -6,5 +6,10 @@ $ignoreErrors[] = [
     'count' => 2,
     'path' => __DIR__ . '/../app/file.php',
 ];
+$ignoreErrors[] = [
+    'rawMessage' => 'Error raw message list<Foo\\Bar>|null',
+    'count' => 1,
+    'path' => __DIR__ . '/../app/index.php',
+];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];

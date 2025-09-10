@@ -15,7 +15,10 @@ final class IntegrationTest extends BinTestCase
     /**
      * @dataProvider provideExtension
      */
-    public function testResultCache(string $extension): void
+    public function testResultCache(
+        string $extension,
+        bool $bleedingEdge
+    ): void
     {
         $emptyConfig = $extension === 'php' ? '<?php return [];' : '';
         $baselinesDir = 'cache/integration-test/baselines';
@@ -33,25 +36,28 @@ final class IntegrationTest extends BinTestCase
         $cwd = __DIR__;
         $phpstan = '../../vendor/bin/phpstan';
         $split = '../../bin/split-phpstan-baseline';
+        $config = $bleedingEdge ? "$extension.bleedingEdge.neon" : "$extension.neon";
 
-        $this->runCommand("$phpstan clear-result-cache -c $extension.neon", $cwd, 0);
-        $this->runCommand("$phpstan analyse -vv -c $extension.neon --generate-baseline=../../$baselinesDir/_loader.$extension", $cwd, 0, null, 'Result cache is saved.');
+        $this->runCommand("$phpstan clear-result-cache -c $config", $cwd, 0);
+        $this->runCommand("$phpstan analyse -vv -c $config --generate-baseline=../../$baselinesDir/_loader.$extension", $cwd, 0, null, 'Result cache is saved.');
         $this->runCommand("php $split ../../$baselinesDir/_loader.$extension", $cwd, 0, 'Writing baseline file');
-        $this->runCommand("$phpstan analyse -vv -c $extension.neon", $cwd, 0, null, 'Result cache restored. 0 files will be reanalysed.');
+        $this->runCommand("$phpstan analyse -vv -c $config", $cwd, 0, null, 'Result cache restored. 0 files will be reanalysed.');
 
         // cache should invalidate by editing the baseline
         file_put_contents($baselinesDirAbs . "/method.notFound.$extension", $emptyConfig);
 
-        $this->runCommand("$phpstan analyse -vv -c $extension.neon", $cwd, 1, 'Call to an undefined method DateTime::invalid()');
+        $this->runCommand("$phpstan analyse -vv -c $config", $cwd, 1, 'Call to an undefined method DateTime::invalid()');
     }
 
     /**
-     * @return iterable<array{string}>
+     * @return iterable<array{string, bool}>
      */
     public function provideExtension(): iterable
     {
-        yield 'Neon' => ['neon'];
-        yield 'PHP' => ['php'];
+        yield 'Neon' => ['neon', false];
+        yield 'Neon (bleeding edge)' => ['neon', true];
+        yield 'PHP' => ['php', false];
+        yield 'PHP (bleeding edge)' => ['php', true];
     }
 
 }

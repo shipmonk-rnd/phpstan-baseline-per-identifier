@@ -1,0 +1,9 @@
+parameters:
+    level: max
+    tmpDir: ../../cache/integration-test/phpstan-cache-php
+    paths:
+        - src
+
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - ../../cache/integration-test/baselines/_loader.php
