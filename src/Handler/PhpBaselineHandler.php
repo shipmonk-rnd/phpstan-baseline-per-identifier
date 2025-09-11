@@ -50,8 +50,7 @@ class PhpBaselineHandler implements BaselineHandler
                 $message = $error['rawMessage'];
                 $messageKey = 'rawMessage';
             } else {
-                assert(isset($error['message']));
-                $message = $error['message'];
+                $message = $error['message']; // @phpstan-ignore offsetAccess.notFound
                 $messageKey = 'message';
             }
 

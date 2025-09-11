@@ -69,7 +69,8 @@ _(optional)_ You can simplify generation with e.g. composer script:
 <details>
 <summary><h3>Legacy usage</h3></summary>
 
-> _This usage is deprecated since 2.0, but it works in all versions. Downside is that it cannot utilize result cache_
+> [!NOTE]
+> This usage is deprecated since 2.0, but it works in all versions. Downside is that it cannot utilize result cache and does not support `rawMessage`.
 
 Setup where your baseline files should be stored and include its loader:
 ```neon
