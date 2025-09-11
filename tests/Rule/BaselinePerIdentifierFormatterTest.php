@@ -36,10 +36,10 @@ final class BaselinePerIdentifierFormatterTest extends PHPStanTestCase
             $this->createOutput(),
         );
 
-        self::assertFileEquals(__DIR__ . '/data/baselines-neon/loader.neon', $fakeRoot . '/baselines/loader.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines-neon/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines-neon/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
-        self::assertFileEquals(__DIR__ . '/data/baselines-neon/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon-deprecated/loader.neon', $fakeRoot . '/baselines/loader.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon-deprecated/sample.identifier.neon', $fakeRoot . '/baselines/sample.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon-deprecated/another.identifier.neon', $fakeRoot . '/baselines/another.identifier.neon');
+        self::assertFileEquals(__DIR__ . '/data/baselines-neon-deprecated/missing-identifier.neon', $fakeRoot . '/baselines/missing-identifier.neon');
     }
 
     /**

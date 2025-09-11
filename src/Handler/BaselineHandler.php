@@ -15,7 +15,7 @@ interface BaselineHandler
     public function decodeBaseline(string $filepath): array;
 
     /**
-     * @param list<array{message: string, count: int, path: string}> $errors
+     * @param list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}> $errors
      */
     public function encodeBaseline(
         ?string $comment,

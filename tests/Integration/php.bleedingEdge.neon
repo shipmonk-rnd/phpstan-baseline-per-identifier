@@ -1,0 +1,3 @@
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - php.neon

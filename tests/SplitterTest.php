@@ -87,7 +87,7 @@ final class SplitterTest extends BinTestCase
         self::assertSame([
             $folder . '/baselines/another.identifier.neon' => 1,
             $folder . '/baselines/missing-identifier.neon' => 1,
-            $folder . '/baselines/sample.identifier.neon' => 2,
+            $folder . '/baselines/sample.identifier.neon' => 3,
             $folder . '/baselines/loader.neon' => null,
         ], $written);
     }
@@ -104,7 +104,7 @@ final class SplitterTest extends BinTestCase
     }
 
     /**
-     * @return array{parameters: array{ignoreErrors: array{0: array{message: string, count: int, path: string, identifier?: string}}}}
+     * @return array{parameters: array{ignoreErrors: array{0: array{message?: string, rawMessage?: string, count: int, path: string, identifier?: string}}}}
      */
     private function getSampleErrors(): array
     {
@@ -127,6 +127,12 @@ final class SplitterTest extends BinTestCase
                         'message' => '#^Error 3$#',
                         'count' => 1,
                         'path' => '../app/index.php',
+                    ],
+                    [
+                        'rawMessage' => 'Error raw message list<Foo\\Bar>|null',
+                        'count' => 1,
+                        'path' => '../app/index.php',
+                        'identifier' => 'sample.identifier',
                     ],
                 ],
             ],

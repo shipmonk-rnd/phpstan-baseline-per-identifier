@@ -1,4 +1,4 @@
-# total 2 errors
+# total 3 errors
 
 parameters:
     ignoreErrors:
@@ -6,3 +6,8 @@ parameters:
             message: '#^Error simple$#'
             count: 2
             path: ../app/file.php
+
+        -
+            rawMessage: Error raw message list<Foo\Bar>|null
+            count: 1
+            path: ../app/index.php

@@ -95,7 +95,7 @@ class BaselineSplitter
 
     /**
      * @param array<mixed> $errors
-     * @return array<string, list<array{message: string, count: int, path: string}>>
+     * @return array<string, list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>>
      *
      * @throws ErrorException
      */
@@ -113,11 +113,15 @@ class BaselineSplitter
 
             $identifier = $error['identifier'] ?? 'missing-identifier';
 
-            if (!isset($error['message'])) {
-                throw new ErrorException("Ignored error #$index is missing 'message'");
+            if (isset($error['rawMessage'])) {
+                $message = $error['rawMessage'];
+                $rawMessage = true;
+            } elseif (isset($error['message'])) {
+                $message = $error['message'];
+                $rawMessage = false;
+            } else {
+                throw new ErrorException("Ignored error #$index is missing 'message' or 'rawMessage'");
             }
-
-            $message = $error['message'];
 
             if (!isset($error['count'])) {
                 throw new ErrorException("Ignored error #$index is missing 'count'");
@@ -140,7 +144,11 @@ class BaselineSplitter
 
             unset($error['identifier']);
 
-            $groupedErrors[$identifier][] = [
+            $groupedErrors[$identifier][] = $rawMessage ? [
+                'rawMessage' => $message,
+                'count' => $count,
+                'path' => $normalizedPath,
+            ] : [
                 'message' => $message,
                 'count' => $count,
                 'path' => $normalizedPath,

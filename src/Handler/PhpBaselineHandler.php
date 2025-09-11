@@ -45,9 +45,18 @@ class PhpBaselineHandler implements BaselineHandler
         $php .= "\$ignoreErrors = [];\n";
 
         foreach ($errors as $error) {
+            if (isset($error['rawMessage'])) {
+                $message = $error['rawMessage'];
+                $messageKey = 'rawMessage';
+            } else {
+                $message = $error['message']; // @phpstan-ignore offsetAccess.notFound
+                $messageKey = 'message';
+            }
+
             $php .= sprintf(
-                "\$ignoreErrors[] = [\n{$indent}'message' => %s,\n{$indent}'count' => %d,\n{$indent}'path' => __DIR__ . %s,\n];\n",
-                var_export($error['message'], true),
+                "\$ignoreErrors[] = [\n{$indent}%s => %s,\n{$indent}'count' => %d,\n{$indent}'path' => __DIR__ . %s,\n];\n",
+                var_export($messageKey, true),
+                var_export($message, true),
                 var_export($error['count'], true),
                 var_export('/' . $error['path'], true),
             );
