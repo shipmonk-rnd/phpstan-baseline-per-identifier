@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "10.7.0",
-        "ergebnis/composer-normalize": "2.47.0",
+        "ergebnis/composer-normalize": "^2.45",
         "phpstan/phpstan-phpunit": "2.0.6",
         "phpstan/phpstan-strict-rules": "2.0.4",
         "phpunit/phpunit": "9.6.23",
