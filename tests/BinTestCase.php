@@ -28,7 +28,7 @@ abstract class BinTestCase extends TestCase
         $procHandle = proc_open($command, $desc, $pipes, $cwd);
         self::assertNotFalse($procHandle);
 
-        /** @var list<resource> $pipes */
+        /** @var array<0|1|2, resource> $pipes */
         $output = stream_get_contents($pipes[1]); // @phpstan-ignore offsetAccess.notFound
         $errorOutput = stream_get_contents($pipes[2]); // @phpstan-ignore offsetAccess.notFound
 

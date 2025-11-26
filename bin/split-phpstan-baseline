@@ -3,6 +3,7 @@
 
 namespace ShipMonk\PHPStan\Baseline;
 
+use LogicException;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 
 $autoloadFiles = [
@@ -15,6 +16,10 @@ foreach ($autoloadFiles as $autoloadFile) {
         require_once $autoloadFile;
         break;
     }
+}
+
+if (!isset($argv)) {
+    throw new LogicException('Missing $argv, check your register_argc_argv setting');
 }
 
 /**
