@@ -23,7 +23,7 @@
         "phpstan/phpstan-phpunit": "2.0.6",
         "phpstan/phpstan-strict-rules": "2.0.4",
         "phpunit/phpunit": "9.6.23",
-        "shipmonk/coding-standard": "^0.1.3",
+        "shipmonk/coding-standard": "^0.2.0",
         "shipmonk/composer-dependency-analyser": "1.8.3",
         "shipmonk/dead-code-detector": "^0.11.0",
         "shipmonk/name-collision-detector": "2.1.1",
