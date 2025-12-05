@@ -9,10 +9,10 @@ use function is_array;
 use function sprintf;
 use function var_export;
 
-class PhpBaselineHandler implements BaselineHandler
+class PhpBaselineHandler extends BaselineHandler
 {
 
-    public function decodeBaseline(string $filepath): array
+    protected function decodeBaselineFile(string $filepath): array
     {
         try {
             $decoded = (static fn () => require $filepath)();
@@ -23,8 +23,10 @@ class PhpBaselineHandler implements BaselineHandler
 
             return $decoded;
 
+        } catch (ErrorException $e) {
+            throw $e;
         } catch (Throwable $e) {
-            throw new ErrorException("Error while loading baseline file '$filepath':" . $e->getMessage(), $e);
+            throw new ErrorException("Error while loading baseline file '$filepath': " . $e->getMessage(), $e);
         }
     }
 
