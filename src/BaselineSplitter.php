@@ -2,12 +2,12 @@
 
 namespace ShipMonk\PHPStan\Baseline;
 
+use ArrayIterator;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use ShipMonk\PHPStan\Baseline\Handler\BaselineHandler;
 use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
 use SplFileInfo;
 use function array_reduce;
-use function array_splice;
 use function dirname;
 use function file_put_contents;
 use function ksort;
@@ -142,14 +142,10 @@ class BaselineSplitter
 
     /**
      * @param array{message?: string, rawMessage?: string, count: int, path: string} $error
-     * @return array{string, string}
      */
-    private function getErrorKey(array $error): array
+    private function getErrorKey(array $error): string
     {
-        return [
-            $error['path'],
-            $error['rawMessage'] ?? $error['message'] ?? '',
-        ];
+        return $error['path'] . "\x00" . ($error['rawMessage'] ?? $error['message'] ?? '');
     }
 
     /**
@@ -178,32 +174,45 @@ class BaselineSplitter
         array $newErrors
     ): array
     {
-        $sortedErrors = [];
+        $newErrorsByKey = [];
 
-        // insert existing errors in the original order
-        foreach ($oldErrors as $oldError) {
-            foreach ($newErrors as $key => $newError) {
-                if ($this->getErrorKey($oldError) === $this->getErrorKey($newError)) {
-                    $sortedErrors[] = $newError;
-                    unset($newErrors[$key]);
-                    break;
-                }
-            }
-        }
-
-        // insert remaining errors
         foreach ($newErrors as $newError) {
-            foreach ($sortedErrors as $key => $sortedError) {
-                if ($this->getErrorKey($newError) < $this->getErrorKey($sortedError)) {
-                    array_splice($sortedErrors, $key, 0, [$newError]);
-                    continue 2;
-                }
-            }
-
-            $sortedErrors[] = $newError;
+            $key = $this->getErrorKey($newError);
+            $newErrorsByKey[$key] = $newError;
         }
 
-        return $sortedErrors;
+        // collect errors that existed before
+        $existingByKey = [];
+
+        foreach ($oldErrors as $oldError) {
+            $key = $this->getErrorKey($oldError);
+
+            if (isset($newErrorsByKey[$key])) {
+                $existingByKey[$key] = $newErrorsByKey[$key];
+                unset($newErrorsByKey[$key]);
+            }
+        }
+
+        // insert new errors at their sorted positions among existing errors
+        ksort($newErrorsByKey);
+        $newErrorsIterator = new ArrayIterator($newErrorsByKey);
+        $result = [];
+
+        foreach ($existingByKey as $existingKey => $existingError) {
+            while ($newErrorsIterator->valid() && $newErrorsIterator->key() < $existingKey) {
+                $result[] = $newErrorsIterator->current();
+                $newErrorsIterator->next();
+            }
+
+            $result[] = $existingError;
+        }
+
+        while ($newErrorsIterator->valid()) {
+            $result[] = $newErrorsIterator->current();
+            $newErrorsIterator->next();
+        }
+
+        return $result;
     }
 
 }
