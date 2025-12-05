@@ -10,6 +10,7 @@ use SplFileInfo;
 use function array_reduce;
 use function dirname;
 use function file_put_contents;
+use function is_file;
 use function ksort;
 use function str_replace;
 
@@ -156,6 +157,10 @@ class BaselineSplitter
         BaselineHandler $handler
     ): ?array
     {
+        if (!is_file($filePath)) {
+            return null;
+        }
+
         try {
             return $handler->decodeBaseline($filePath);
 
