@@ -334,6 +334,138 @@ NEON;
         self::assertStringContainsString('Error C', $result);
     }
 
+    public function testOrphanedFilesAreDeleted(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/loader.neon';
+
+        // Create existing baseline files for two identifiers
+        $existingBaseline1 = <<<'NEON'
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error A$#'
+            count: 1
+            path: ../app/a.php
+
+NEON;
+        $existingBaseline2 = <<<'NEON'
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error B$#'
+            count: 1
+            path: ../app/b.php
+
+NEON;
+        file_put_contents($folder . '/baselines/first.identifier.neon', $existingBaseline1);
+        file_put_contents($folder . '/baselines/second.identifier.neon', $existingBaseline2);
+
+        // Now regenerate with only first.identifier (second.identifier should be deleted)
+        $inputErrors = [
+            'parameters' => [
+                'ignoreErrors' => [
+                    ['message' => '#^Error A$#', 'count' => 1, 'path' => '../app/a.php', 'identifier' => 'first.identifier'],
+                ],
+            ],
+        ];
+        file_put_contents($loaderPath, Neon::encode($inputErrors));
+
+        $splitter = new BaselineSplitter("\t", true);
+        $result = $splitter->split($loaderPath);
+
+        $firstIdentifierPath = $folder . '/baselines/first.identifier.neon';
+        $secondIdentifierPath = $folder . '/baselines/second.identifier.neon';
+
+        // first.identifier.neon should still exist
+        self::assertFileExists($firstIdentifierPath);
+        self::assertArrayHasKey($firstIdentifierPath, $result);
+        self::assertSame(1, $result[$firstIdentifierPath]);
+
+        // second.identifier.neon should be deleted
+        self::assertFileDoesNotExist($secondIdentifierPath);
+        self::assertArrayHasKey($secondIdentifierPath, $result);
+        self::assertSame(0, $result[$secondIdentifierPath]);
+
+        // loader should still exist
+        self::assertFileExists($loaderPath);
+        self::assertArrayHasKey($loaderPath, $result);
+        self::assertNull($result[$loaderPath]);
+    }
+
+    public function testLoaderFileIsNotDeleted(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/loader.neon';
+        $orphanPath = $folder . '/baselines/orphan.neon';
+
+        // Create an empty baseline (no errors)
+        $inputErrors = [
+            'parameters' => [
+                'ignoreErrors' => [],
+            ],
+        ];
+        file_put_contents($loaderPath, Neon::encode($inputErrors));
+
+        // Create an orphaned file that happens to exist
+        file_put_contents($orphanPath, 'some content');
+
+        $splitter = new BaselineSplitter("\t", true);
+        $result = $splitter->split($loaderPath);
+
+        // Loader should still exist
+        self::assertFileExists($loaderPath);
+        self::assertArrayHasKey($loaderPath, $result);
+        self::assertNull($result[$loaderPath]);
+
+        // Orphaned file should be deleted
+        self::assertFileDoesNotExist($orphanPath);
+        self::assertArrayHasKey($orphanPath, $result);
+        self::assertSame(0, $result[$orphanPath]);
+    }
+
+    public function testOnlyFilesWithMatchingExtensionAreDeleted(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/loader.neon';
+
+        // Create a .neon baseline file and a .php file
+        $existingBaseline = <<<'NEON'
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Error A$#'
+            count: 1
+            path: ../app/a.php
+
+NEON;
+        file_put_contents($folder . '/baselines/old.identifier.neon', $existingBaseline);
+        file_put_contents($folder . '/baselines/some.file.php', '<?php // some php file');
+
+        // Regenerate with empty baseline
+        $inputErrors = [
+            'parameters' => [
+                'ignoreErrors' => [],
+            ],
+        ];
+        file_put_contents($loaderPath, Neon::encode($inputErrors));
+
+        $splitter = new BaselineSplitter("\t", true);
+        $result = $splitter->split($loaderPath);
+
+        $oldIdentifierPath = $folder . '/baselines/old.identifier.neon';
+        $phpFilePath = $folder . '/baselines/some.file.php';
+
+        // .neon file should be deleted
+        self::assertFileDoesNotExist($oldIdentifierPath);
+        self::assertArrayHasKey($oldIdentifierPath, $result);
+        self::assertSame(0, $result[$oldIdentifierPath]);
+
+        // .php file should NOT be deleted (wrong extension)
+        self::assertFileExists($phpFilePath);
+        self::assertArrayNotHasKey($phpFilePath, $result);
+    }
+
     /**
      * @return array{parameters: array{ignoreErrors: array{0: array{message?: string, rawMessage?: string, count: int, path: string, identifier?: string}}}}
      */

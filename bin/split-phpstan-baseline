@@ -56,7 +56,13 @@ try {
     $writtenBaselines = $splitter->split($loaderFile);
 
     foreach ($writtenBaselines as $writtenBaseline => $errorsCount) {
-        echo "Writing baseline file $writtenBaseline" . ($errorsCount !== null ? " with $errorsCount errors\n" : "\n");
+        if ($errorsCount === 0) {
+            echo "Deleting baseline file $writtenBaseline\n";
+        } elseif ($errorsCount !== null) {
+            echo "Writing baseline file $writtenBaseline with $errorsCount errors\n";
+        } else {
+            echo "Writing baseline file $writtenBaseline\n";
+        }
     }
 
 } catch (ErrorException $e) {
