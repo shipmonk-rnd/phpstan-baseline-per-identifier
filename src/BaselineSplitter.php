@@ -8,11 +8,14 @@ use ShipMonk\PHPStan\Baseline\Handler\BaselineHandler;
 use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
 use SplFileInfo;
 use function array_reduce;
+use function basename;
 use function dirname;
 use function file_put_contents;
+use function glob;
 use function is_file;
 use function ksort;
 use function str_replace;
+use function unlink;
 
 class BaselineSplitter
 {
@@ -31,7 +34,7 @@ class BaselineSplitter
     }
 
     /**
-     * @return array<string, int|null>
+     * @return array<string, int|null> file path => error count (null for loader, 0 for deleted)
      *
      * @throws ErrorException
      */
@@ -45,6 +48,7 @@ class BaselineSplitter
         }
 
         $folder = dirname($realPath);
+        $loaderFileName = $splFile->getFilename();
         $extension = $splFile->getExtension();
 
         $handler = HandlerFactory::create($extension);
@@ -53,6 +57,7 @@ class BaselineSplitter
 
         $outputInfo = [];
         $baselineFiles = [];
+        $writtenFiles = [];
         $totalErrorCount = 0;
 
         foreach ($groupedErrors as $identifier => $newErrors) {
@@ -67,6 +72,7 @@ class BaselineSplitter
 
             $outputInfo[$filePath] = $errorsCount;
             $baselineFiles[] = $fileName;
+            $writtenFiles[$filePath] = true;
 
             $plural = $errorsCount === 1 ? '' : 's';
             $prefix = $this->includeCount ? "total $errorsCount error$plural" : null;
@@ -81,6 +87,13 @@ class BaselineSplitter
         $this->writeFile($realPath, $baselineLoaderData);
 
         $outputInfo[$realPath] = null;
+
+        // Delete orphaned baseline files
+        $deletedFiles = $this->deleteOrphanedFiles($folder, $extension, $loaderFileName, $writtenFiles);
+
+        foreach ($deletedFiles as $deletedFile) {
+            $outputInfo[$deletedFile] = 0;
+        }
 
         return $outputInfo;
     }
@@ -218,6 +231,46 @@ class BaselineSplitter
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<string, true> $writtenFiles
+     * @return list<string>
+     */
+    private function deleteOrphanedFiles(
+        string $folder,
+        string $extension,
+        string $loaderFileName,
+        array $writtenFiles
+    ): array
+    {
+        $deletedFiles = [];
+        $existingFiles = glob($folder . '/*.' . $extension);
+
+        if ($existingFiles === false) {
+            return [];
+        }
+
+        foreach ($existingFiles as $existingFile) {
+            $fileName = basename($existingFile);
+
+            // Skip the loader file
+            if ($fileName === $loaderFileName) {
+                continue;
+            }
+
+            // Skip files that were written in this run
+            if (isset($writtenFiles[$existingFile])) {
+                continue;
+            }
+
+            // Delete orphaned file
+            if (unlink($existingFile)) {
+                $deletedFiles[] = $existingFile;
+            }
+        }
+
+        return $deletedFiles;
     }
 
 }
