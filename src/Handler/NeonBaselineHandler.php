@@ -9,10 +9,10 @@ use ShipMonk\PHPStan\Baseline\NeonHelper;
 use function gettype;
 use function is_array;
 
-class NeonBaselineHandler implements BaselineHandler
+class NeonBaselineHandler extends BaselineHandler
 {
 
-    public function decodeBaseline(string $filepath): array
+    protected function decodeBaselineFile(string $filepath): array
     {
         try {
             /** @throws NeonException */

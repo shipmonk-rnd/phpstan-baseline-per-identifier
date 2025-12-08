@@ -2,16 +2,15 @@
 
 namespace ShipMonk\PHPStan\Baseline;
 
+use ArrayIterator;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
+use ShipMonk\PHPStan\Baseline\Handler\BaselineHandler;
 use ShipMonk\PHPStan\Baseline\Handler\HandlerFactory;
 use SplFileInfo;
 use function array_reduce;
-use function assert;
 use function dirname;
 use function file_put_contents;
-use function is_array;
-use function is_int;
-use function is_string;
+use function is_file;
 use function ksort;
 use function str_replace;
 
@@ -49,28 +48,21 @@ class BaselineSplitter
         $extension = $splFile->getExtension();
 
         $handler = HandlerFactory::create($extension);
-        $data = $handler->decodeBaseline($realPath);
-
-        $ignoredErrors = $data['parameters']['ignoreErrors'] ?? null; // @phpstan-ignore offsetAccess.nonOffsetAccessible
-
-        if (!is_array($ignoredErrors)) {
-            throw new ErrorException(
-                "Invalid argument, expected $extension file with 'parameters.ignoreErrors' key in '$loaderFilePath'." .
-                "\n - Did you run native baseline generation first?" .
-                "\n - You can so via vendor/bin/phpstan --generate-baseline=$loaderFilePath",
-            );
-        }
-
+        $ignoredErrors = $handler->decodeBaseline($realPath);
         $groupedErrors = $this->groupErrorsByIdentifier($ignoredErrors, $folder);
 
         $outputInfo = [];
         $baselineFiles = [];
         $totalErrorCount = 0;
 
-        foreach ($groupedErrors as $identifier => $errors) {
+        foreach ($groupedErrors as $identifier => $newErrors) {
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
-            $errorsCount = array_reduce($errors, static fn (int $carry, array $item): int => $carry + $item['count'], 0);
+
+            $oldErrors = $this->readExistingErrors($filePath, $handler) ?? [];
+            $sortedErrors = $this->sortErrors($oldErrors, $newErrors);
+
+            $errorsCount = array_reduce($sortedErrors, static fn (int $carry, array $item): int => $carry + $item['count'], 0);
             $totalErrorCount += $errorsCount;
 
             $outputInfo[$filePath] = $errorsCount;
@@ -79,7 +71,7 @@ class BaselineSplitter
             $plural = $errorsCount === 1 ? '' : 's';
             $prefix = $this->includeCount ? "total $errorsCount error$plural" : null;
 
-            $encodedData = $handler->encodeBaseline($prefix, $errors, $this->indent);
+            $encodedData = $handler->encodeBaseline($prefix, $sortedErrors, $this->indent);
             $this->writeFile($filePath, $encodedData);
         }
 
@@ -94,7 +86,7 @@ class BaselineSplitter
     }
 
     /**
-     * @param array<mixed> $errors
+     * @param list<array{message: string, count: int, path: string, identifier: string|null}|array{rawMessage: string, count: int, path: string, identifier: string|null}> $errors
      * @return array<string, list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>>
      *
      * @throws ErrorException
@@ -106,53 +98,27 @@ class BaselineSplitter
     {
         $groupedErrors = [];
 
-        foreach ($errors as $index => $error) {
-            if (!is_array($error)) {
-                throw new ErrorException("Ignored error #$index is not an array");
-            }
-
+        foreach ($errors as $error) {
             $identifier = $error['identifier'] ?? 'missing-identifier';
+            $normalizedPath = str_replace($folder . '/', '', $error['path']);
 
             if (isset($error['rawMessage'])) {
-                $message = $error['rawMessage'];
-                $rawMessage = true;
+                $groupedErrors[$identifier][] = [
+                    'rawMessage' => $error['rawMessage'],
+                    'count' => $error['count'],
+                    'path' => $normalizedPath,
+                ];
+
             } elseif (isset($error['message'])) {
-                $message = $error['message'];
-                $rawMessage = false;
+                $groupedErrors[$identifier][] = [
+                    'message' => $error['message'],
+                    'count' => $error['count'],
+                    'path' => $normalizedPath,
+                ];
+
             } else {
-                throw new ErrorException("Ignored error #$index is missing 'message' or 'rawMessage'");
+                throw new ErrorException('Error is missing message or rawMessage');
             }
-
-            if (!isset($error['count'])) {
-                throw new ErrorException("Ignored error #$index is missing 'count'");
-            }
-
-            $count = $error['count'];
-
-            if (!isset($error['path'])) {
-                throw new ErrorException("Ignored error #$index is missing 'path'");
-            }
-
-            $path = $error['path'];
-
-            assert(is_string($identifier));
-            assert(is_string($message));
-            assert(is_int($count));
-            assert(is_string($path));
-
-            $normalizedPath = str_replace($folder . '/', '', $path);
-
-            unset($error['identifier']);
-
-            $groupedErrors[$identifier][] = $rawMessage ? [
-                'rawMessage' => $message,
-                'count' => $count,
-                'path' => $normalizedPath,
-            ] : [
-                'message' => $message,
-                'count' => $count,
-                'path' => $normalizedPath,
-            ];
         }
 
         ksort($groupedErrors);
@@ -173,6 +139,85 @@ class BaselineSplitter
         if ($written === false) {
             throw new ErrorException('Error while writing to ' . $filePath);
         }
+    }
+
+    /**
+     * @param array{message?: string, rawMessage?: string, count: int, path: string} $error
+     */
+    private function getErrorKey(array $error): string
+    {
+        return $error['path'] . "\x00" . ($error['rawMessage'] ?? $error['message'] ?? '');
+    }
+
+    /**
+     * @return list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>|null
+     */
+    private function readExistingErrors(
+        string $filePath,
+        BaselineHandler $handler
+    ): ?array
+    {
+        if (!is_file($filePath)) {
+            return null;
+        }
+
+        try {
+            return $handler->decodeBaseline($filePath);
+
+        } catch (ErrorException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}> $oldErrors
+     * @param list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}> $newErrors
+     * @return list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>
+     */
+    private function sortErrors(
+        array $oldErrors,
+        array $newErrors
+    ): array
+    {
+        $newErrorsByKey = [];
+
+        foreach ($newErrors as $newError) {
+            $key = $this->getErrorKey($newError);
+            $newErrorsByKey[$key] = $newError;
+        }
+
+        // collect errors that existed before
+        $existingByKey = [];
+
+        foreach ($oldErrors as $oldError) {
+            $key = $this->getErrorKey($oldError);
+
+            if (isset($newErrorsByKey[$key])) {
+                $existingByKey[$key] = $newErrorsByKey[$key];
+                unset($newErrorsByKey[$key]);
+            }
+        }
+
+        // insert new errors at their sorted positions among existing errors
+        ksort($newErrorsByKey);
+        $newErrorsIterator = new ArrayIterator($newErrorsByKey);
+        $result = [];
+
+        foreach ($existingByKey as $existingKey => $existingError) {
+            while ($newErrorsIterator->valid() && $newErrorsIterator->key() < $existingKey) {
+                $result[] = $newErrorsIterator->current();
+                $newErrorsIterator->next();
+            }
+
+            $result[] = $existingError;
+        }
+
+        while ($newErrorsIterator->valid()) {
+            $result[] = $newErrorsIterator->current();
+            $newErrorsIterator->next();
+        }
+
+        return $result;
     }
 
 }
