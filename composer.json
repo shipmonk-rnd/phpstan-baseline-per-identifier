@@ -27,7 +27,7 @@
         "shipmonk/composer-dependency-analyser": "1.8.3",
         "shipmonk/dead-code-detector": "^0.11.0",
         "shipmonk/name-collision-detector": "2.1.1",
-        "shipmonk/phpstan-rules": "4.1.2"
+        "shipmonk/phpstan-rules": "4.3.5"
     },
     "autoload": {
         "psr-4": {
