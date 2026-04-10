@@ -101,8 +101,6 @@ class BaselineSplitter
     /**
      * @param list<array{message: string, count: int, path: string, identifier: string|null}|array{rawMessage: string, count: int, path: string, identifier: string|null}> $errors
      * @return array<string, list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>>
-     *
-     * @throws ErrorException
      */
     private function groupErrorsByIdentifier(
         array $errors,
@@ -122,15 +120,12 @@ class BaselineSplitter
                     'path' => $normalizedPath,
                 ];
 
-            } elseif (isset($error['message'])) {
+            } else {
                 $groupedErrors[$identifier][] = [
                     'message' => $error['message'],
                     'count' => $error['count'],
                     'path' => $normalizedPath,
                 ];
-
-            } else {
-                throw new ErrorException('Error is missing message or rawMessage');
             }
         }
 

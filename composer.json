@@ -25,7 +25,7 @@
         "phpunit/phpunit": "^9.6.33",
         "shipmonk/coding-standard": "^0.2.0",
         "shipmonk/composer-dependency-analyser": "1.8.3",
-        "shipmonk/dead-code-detector": "^0.11.0",
+        "shipmonk/dead-code-detector": "^1.0",
         "shipmonk/name-collision-detector": "2.1.1",
         "shipmonk/phpstan-rules": "4.3.5"
     },
