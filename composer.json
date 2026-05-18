@@ -13,7 +13,7 @@
         "error identifier"
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.1",
         "nette/neon": "^3.3.3 || ^4.0",
         "phpstan/phpstan": "^2"
     },

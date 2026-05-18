@@ -16,7 +16,7 @@ abstract class BinTestCase extends TestCase
         string $cwd,
         int $expectedExitCode,
         ?string $expectedOutputContains = null,
-        ?string $expectedErrorContains = null
+        ?string $expectedErrorContains = null,
     ): void
     {
         $desc = [

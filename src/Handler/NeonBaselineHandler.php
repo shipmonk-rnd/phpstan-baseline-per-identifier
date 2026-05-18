@@ -32,7 +32,7 @@ class NeonBaselineHandler extends BaselineHandler
     public function encodeBaseline(
         ?string $comment,
         array $errors,
-        string $indent
+        string $indent,
     ): string
     {
         $prefix = $comment !== null ? "# $comment\n\n" : '';
@@ -42,7 +42,7 @@ class NeonBaselineHandler extends BaselineHandler
     public function encodeBaselineLoader(
         ?string $comment,
         array $filePaths,
-        string $indent
+        string $indent,
     ): string
     {
         $prefix = $comment !== null ? "# $comment\n\n" : '';
