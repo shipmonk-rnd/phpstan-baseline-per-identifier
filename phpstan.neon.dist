@@ -9,7 +9,7 @@ includes:
     - ./extension.neon
 
 parameters:
-    phpVersion: 80000
+    phpVersion: 80100
     paths:
         - bin/split-phpstan-baseline
         - src

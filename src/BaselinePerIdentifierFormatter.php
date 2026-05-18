@@ -25,13 +25,11 @@ use const SORT_STRING;
 class BaselinePerIdentifierFormatter implements ErrorFormatter
 {
 
-    private string $baselinesDir;
-
-    private string $indent;
+    private readonly string $baselinesDir;
 
     public function __construct(
         ?string $baselinesDir,
-        string $indent
+        private readonly string $indent,
     )
     {
         if ($baselinesDir === null) {
@@ -45,12 +43,11 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
         }
 
         $this->baselinesDir = $baselinesRealDir;
-        $this->indent = $indent;
     }
 
     public function formatErrors(
         AnalysisResult $analysisResult,
-        Output $output
+        Output $output,
     ): int
     {
         foreach ($analysisResult->getInternalErrorObjects() as $internalError) {
@@ -138,7 +135,7 @@ class BaselinePerIdentifierFormatter implements ErrorFormatter
 
     private function getPathDifference(
         string $from,
-        string $to
+        string $to,
     ): string
     {
         $fromParts = explode(DIRECTORY_SEPARATOR, $from);

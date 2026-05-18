@@ -10,12 +10,9 @@ use function trim;
 class NeonHelper
 {
 
-    /**
-     * @param mixed $data
-     */
     public static function encode(
-        $data,
-        string $indent
+        mixed $data,
+        string $indent,
     ): string
     {
         return trim(Neon::encode($data, true, $indent)) . "\n";

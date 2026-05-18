@@ -17,7 +17,7 @@ final class IntegrationTest extends BinTestCase
      */
     public function testResultCache(
         string $extension,
-        bool $bleedingEdge
+        bool $bleedingEdge,
     ): void
     {
         $emptyConfig = $extension === 'php' ? '<?php return [];' : '';

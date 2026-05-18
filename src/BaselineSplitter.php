@@ -20,17 +20,11 @@ use function unlink;
 class BaselineSplitter
 {
 
-    private string $indent;
-
-    private bool $includeCount;
-
     public function __construct(
-        string $indent,
-        bool $includeCount
+        private readonly string $indent,
+        private readonly bool $includeCount,
     )
     {
-        $this->indent = $indent;
-        $this->includeCount = $includeCount;
     }
 
     /**
@@ -101,12 +95,10 @@ class BaselineSplitter
     /**
      * @param list<array{message: string, count: int, path: string, identifier: string|null}|array{rawMessage: string, count: int, path: string, identifier: string|null}> $errors
      * @return array<string, list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>>
-     *
-     * @throws ErrorException
      */
     private function groupErrorsByIdentifier(
         array $errors,
-        string $folder
+        string $folder,
     ): array
     {
         $groupedErrors = [];
@@ -122,15 +114,12 @@ class BaselineSplitter
                     'path' => $normalizedPath,
                 ];
 
-            } elseif (isset($error['message'])) {
+            } else {
                 $groupedErrors[$identifier][] = [
                     'message' => $error['message'],
                     'count' => $error['count'],
                     'path' => $normalizedPath,
                 ];
-
-            } else {
-                throw new ErrorException('Error is missing message or rawMessage');
             }
         }
 
@@ -144,7 +133,7 @@ class BaselineSplitter
      */
     private function writeFile(
         string $filePath,
-        string $contents
+        string $contents,
     ): void
     {
         $written = file_put_contents($filePath, $contents);
@@ -167,7 +156,7 @@ class BaselineSplitter
      */
     private function readExistingErrors(
         string $filePath,
-        BaselineHandler $handler
+        BaselineHandler $handler,
     ): ?array
     {
         if (!is_file($filePath)) {
@@ -189,7 +178,7 @@ class BaselineSplitter
      */
     private function sortErrors(
         array $oldErrors,
-        array $newErrors
+        array $newErrors,
     ): array
     {
         $newErrorsByKey = [];
@@ -241,7 +230,7 @@ class BaselineSplitter
         string $folder,
         string $extension,
         string $loaderFileName,
-        array $writtenFiles
+        array $writtenFiles,
     ): array
     {
         $deletedFiles = [];

@@ -94,7 +94,7 @@ abstract class BaselineHandler
     abstract public function encodeBaseline(
         ?string $comment,
         array $errors,
-        string $indent
+        string $indent,
     ): string;
 
     /**
@@ -103,7 +103,7 @@ abstract class BaselineHandler
     abstract public function encodeBaselineLoader(
         ?string $comment,
         array $filePaths,
-        string $indent
+        string $indent,
     ): string;
 
 }

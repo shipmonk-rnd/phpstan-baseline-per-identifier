@@ -33,7 +33,7 @@ class PhpBaselineHandler extends BaselineHandler
     public function encodeBaseline(
         ?string $comment,
         array $errors,
-        string $indent
+        string $indent,
     ): string
     {
         $php = '<?php declare(strict_types = 1);';
@@ -51,7 +51,7 @@ class PhpBaselineHandler extends BaselineHandler
                 $message = $error['rawMessage'];
                 $messageKey = 'rawMessage';
             } else {
-                $message = $error['message']; // @phpstan-ignore offsetAccess.notFound
+                $message = $error['message'];
                 $messageKey = 'message';
             }
 
@@ -74,7 +74,7 @@ class PhpBaselineHandler extends BaselineHandler
     public function encodeBaselineLoader(
         ?string $comment,
         array $filePaths,
-        string $indent
+        string $indent,
     ): string
     {
         $php = "<?php declare(strict_types = 1);\n\n";
