@@ -95,6 +95,9 @@ class BaselineSplitter
     /**
      * @param list<array{message: string, count: int, path: string, identifier: string|null}|array{rawMessage: string, count: int, path: string, identifier: string|null}> $errors
      * @return array<string, list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}>>
+     *
+     * @throws ErrorException
+     * @phpstan-ignore throws.unusedType
      */
     private function groupErrorsByIdentifier(
         array $errors,
@@ -114,12 +117,15 @@ class BaselineSplitter
                     'path' => $normalizedPath,
                 ];
 
-            } else {
+            } elseif (isset($error['message'])) { // @phpstan-ignore isset.offset
                 $groupedErrors[$identifier][] = [
                     'message' => $error['message'],
                     'count' => $error['count'],
                     'path' => $normalizedPath,
                 ];
+
+            } else {
+                throw new ErrorException('Error is missing message or rawMessage');
             }
         }
 
