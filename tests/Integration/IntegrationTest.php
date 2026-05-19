@@ -2,6 +2,7 @@
 
 namespace ShipMonk\PHPStan\Baseline\Integration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ShipMonk\PHPStan\Baseline\BinTestCase;
 use function array_map;
 use function file_put_contents;
@@ -12,9 +13,7 @@ use function mkdir;
 final class IntegrationTest extends BinTestCase
 {
 
-    /**
-     * @dataProvider provideExtension
-     */
+    #[DataProvider('provideExtension')]
     public function testResultCache(
         string $extension,
         bool $bleedingEdge,
@@ -52,7 +51,7 @@ final class IntegrationTest extends BinTestCase
     /**
      * @return iterable<array{string, bool}>
      */
-    public function provideExtension(): iterable
+    public static function provideExtension(): iterable
     {
         yield 'Neon' => ['neon', false];
         yield 'Neon (bleeding edge)' => ['neon', true];
