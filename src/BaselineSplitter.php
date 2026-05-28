@@ -164,11 +164,20 @@ class BaselineSplitter
         }
 
         try {
-            return $handler->decodeBaseline($filePath);
+            $decoded = $handler->decodeBaseline($filePath);
 
         } catch (ErrorException $e) {
             return null;
         }
+
+        $errors = [];
+
+        foreach ($decoded as $error) {
+            unset($error['identifier']);
+            $errors[] = $error;
+        }
+
+        return $errors;
     }
 
     /**
