@@ -467,7 +467,7 @@ NEON;
     }
 
     /**
-     * @return array{parameters: array{ignoreErrors: array{0: array{message?: string, rawMessage?: string, count: int, path: string, identifier?: string}}}}
+     * @return array{parameters: array{ignoreErrors: list<array{message?: string, rawMessage?: string, count: int, path: string, identifier?: string}>}}
      */
     private function getSampleErrors(): array
     {
