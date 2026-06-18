@@ -99,7 +99,7 @@ Prepare composer script to simplify generation:
 
 </details>
 
-## Cli options
+## `split-phpstan-baseline` Cli options
 - ``--tabs`` to use tabs as indents in generated neon files
 - ``--no-error-count`` to remove errors count in generated files
 
