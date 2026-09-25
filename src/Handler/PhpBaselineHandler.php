@@ -101,7 +101,7 @@ class PhpBaselineHandler extends BaselineHandler
 
     private function isAbsolutePath(string $path): bool
     {
-        return preg_match('~^(?:[/\\\\]|[a-zA-Z]:[/\\\\]|[a-z][a-z0-9+.-]*://)~', $path) === 1;
+        return preg_match('#([a-z]:)?[/\\\\]|[a-z][a-z0-9+.-]*://#Ai', $path) === 1;
     }
 
 }
