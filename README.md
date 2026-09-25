@@ -46,9 +46,6 @@ Run native baseline generation and split it into multiple files via our script (
 vendor/bin/phpstan --generate-baseline=baselines/_loader.neon && vendor/bin/split-phpstan-baseline baselines/_loader.neon
 ```
 
-> [!NOTE]
-> Keep the loader in a dedicated folder. The script deletes baseline files in that folder that it did not write (e.g. files for identifiers with no errors left). It keeps files that are not baselines.
-
 Setup the baselines loader:
 ```neon
 # phpstan.neon.dist
