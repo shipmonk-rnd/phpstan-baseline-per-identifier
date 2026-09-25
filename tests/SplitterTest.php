@@ -163,6 +163,62 @@ NEON;
         self::assertLessThan($posB, $posA, 'Error A should come before Error B');
     }
 
+    public function testPreservesOrderOfExistingErrorsInPhp(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/loader.php';
+
+        $existingBaseline = <<<'PHP'
+<?php declare(strict_types = 1);
+
+$ignoreErrors = [];
+$ignoreErrors[] = [
+    'message' => '#^Error C$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../app/c.php',
+];
+$ignoreErrors[] = [
+    'message' => '#^Error A$#',
+    'count' => 1,
+    'path' => __DIR__ . '/../app/a.php',
+];
+
+return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
+
+PHP;
+        file_put_contents($folder . '/baselines/test.identifier.php', $existingBaseline);
+
+        $loader = <<<'PHP'
+<?php declare(strict_types = 1);
+
+$ignoreErrors = [];
+$ignoreErrors[] = ['message' => '#^Error A$#', 'identifier' => 'test.identifier', 'count' => 1, 'path' => __DIR__ . '/../app/a.php'];
+$ignoreErrors[] = ['message' => '#^Error B$#', 'identifier' => 'test.identifier', 'count' => 1, 'path' => __DIR__ . '/../app/b.php'];
+$ignoreErrors[] = ['message' => '#^Error C$#', 'identifier' => 'test.identifier', 'count' => 1, 'path' => __DIR__ . '/../app/c.php'];
+
+return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
+
+PHP;
+        file_put_contents($loaderPath, $loader);
+
+        $splitter = new BaselineSplitter("\t", true);
+        $splitter->split($loaderPath);
+
+        $result = file_get_contents($folder . '/baselines/test.identifier.php');
+        self::assertNotFalse($result);
+
+        // existing C, A keep their order, new B goes before C (sorted by path)
+        $posA = strpos($result, 'Error A');
+        $posB = strpos($result, 'Error B');
+        $posC = strpos($result, 'Error C');
+
+        self::assertNotFalse($posA);
+        self::assertNotFalse($posB);
+        self::assertNotFalse($posC);
+        self::assertLessThan($posC, $posB, 'Error B should come before Error C');
+        self::assertLessThan($posA, $posC, 'Error C should come before Error A');
+    }
+
     public function testNewErrorsInsertedInSortedPosition(): void
     {
         $folder = $this->prepareSampleFolder();
