@@ -4,13 +4,17 @@ namespace ShipMonk\PHPStan\Baseline\Handler;
 
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use Throwable;
+use function file_get_contents;
 use function gettype;
 use function is_array;
 use function sprintf;
+use function str_contains;
 use function var_export;
 
 class PhpBaselineHandler extends BaselineHandler
 {
+
+    private const RETURN_STATEMENT = 'return [\'parameters\' => [\'ignoreErrors\' => $ignoreErrors]];';
 
     protected function decodeBaselineFile(string $filepath): array
     {
@@ -28,6 +32,14 @@ class PhpBaselineHandler extends BaselineHandler
         } catch (Throwable $e) {
             throw new ErrorException("Error while loading baseline file '$filepath': " . $e->getMessage(), $e);
         }
+    }
+
+    public function isBaselineFile(string $filepath): bool
+    {
+        // the file is not executed, it can be any PHP script (e.g. rector.php)
+        $contents = file_get_contents($filepath);
+
+        return $contents !== false && str_contains($contents, self::RETURN_STATEMENT);
     }
 
     public function encodeBaseline(
@@ -65,7 +77,7 @@ class PhpBaselineHandler extends BaselineHandler
         }
 
         $php .= "\n";
-        $php .= 'return [\'parameters\' => [\'ignoreErrors\' => $ignoreErrors]];';
+        $php .= self::RETURN_STATEMENT;
         $php .= "\n";
 
         return $php;
