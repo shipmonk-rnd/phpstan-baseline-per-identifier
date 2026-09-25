@@ -6,6 +6,7 @@ use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use Throwable;
 use function gettype;
 use function is_array;
+use function preg_match;
 use function sprintf;
 use function var_export;
 
@@ -55,12 +56,16 @@ class PhpBaselineHandler extends BaselineHandler
                 $messageKey = 'message';
             }
 
+            $path = $this->isAbsolutePath($error['path'])
+                ? var_export($error['path'], true)
+                : '__DIR__ . ' . var_export('/' . $error['path'], true);
+
             $php .= sprintf(
-                "\$ignoreErrors[] = [\n{$indent}%s => %s,\n{$indent}'count' => %d,\n{$indent}'path' => __DIR__ . %s,\n];\n",
+                "\$ignoreErrors[] = [\n{$indent}%s => %s,\n{$indent}'count' => %d,\n{$indent}'path' => %s,\n];\n",
                 var_export($messageKey, true),
                 var_export($message, true),
                 var_export($error['count'], true),
-                var_export('/' . $error['path'], true),
+                $path,
             );
         }
 
@@ -92,6 +97,11 @@ class PhpBaselineHandler extends BaselineHandler
         $php .= "]];\n";
 
         return $php;
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        return preg_match('~^(?:[/\\\\]|[a-zA-Z]:[/\\\\]|[a-z][a-z0-9+.-]*://)~', $path) === 1;
     }
 
 }
