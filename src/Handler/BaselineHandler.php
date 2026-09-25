@@ -89,6 +89,11 @@ abstract class BaselineHandler
     abstract protected function decodeBaselineFile(string $filepath): array;
 
     /**
+     * Returns true only for files in the format that this tool and PHPStan write.
+     */
+    abstract public function isBaselineFile(string $filepath): bool;
+
+    /**
      * @param list<array{message: string, count: int, path: string}|array{rawMessage: string, count: int, path: string}> $errors
      */
     abstract public function encodeBaseline(

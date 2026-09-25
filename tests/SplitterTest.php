@@ -3,6 +3,7 @@
 namespace ShipMonk\PHPStan\Baseline;
 
 use Nette\Neon\Neon;
+use ShipMonk\PHPStan\Baseline\Handler\PhpBaselineHandler;
 use function file_get_contents;
 use function file_put_contents;
 use function mkdir;
@@ -408,7 +409,7 @@ NEON;
         file_put_contents($loaderPath, Neon::encode($inputErrors));
 
         // Create an orphaned file that happens to exist
-        file_put_contents($orphanPath, 'some content');
+        file_put_contents($orphanPath, "parameters:\n    ignoreErrors: []\n");
 
         $splitter = new BaselineSplitter("\t", true);
         $result = $splitter->split($loaderPath);
@@ -464,6 +465,53 @@ NEON;
         // .php file should NOT be deleted (wrong extension)
         self::assertFileExists($phpFilePath);
         self::assertArrayNotHasKey($phpFilePath, $result);
+    }
+
+    public function testNonBaselineNeonFilesAreNotDeleted(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/phpstan-baseline.neon';
+        $configPath = $folder . '/baselines/phpstan.neon';
+        $invalidPath = $folder . '/baselines/invalid.neon';
+        $orphanPath = $folder . '/baselines/orphan.identifier.neon';
+
+        file_put_contents($configPath, "includes:\n    - phpstan-baseline.neon\n\nparameters:\n    level: 8\n    ignoreErrors: []\n");
+        file_put_contents($invalidPath, "foo: [\n");
+        file_put_contents($orphanPath, "parameters:\n    ignoreErrors: []\n");
+        file_put_contents($loaderPath, Neon::encode(['parameters' => ['ignoreErrors' => []]]));
+
+        $splitter = new BaselineSplitter("\t", true);
+        $result = $splitter->split($loaderPath);
+
+        self::assertFileExists($configPath);
+        self::assertArrayNotHasKey($configPath, $result);
+        self::assertFileExists($invalidPath);
+        self::assertArrayNotHasKey($invalidPath, $result);
+        self::assertFileDoesNotExist($orphanPath);
+        self::assertArrayHasKey($orphanPath, $result);
+        self::assertSame(0, $result[$orphanPath]);
+    }
+
+    public function testNonBaselinePhpFilesAreNotDeleted(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/phpstan-baseline.php';
+        $rectorPath = $folder . '/baselines/rector.php';
+        $orphanPath = $folder . '/baselines/orphan.identifier.php';
+
+        file_put_contents($rectorPath, "<?php\n\nthrow new LogicException('must not be executed');\n");
+        file_put_contents($loaderPath, '<?php return ' . var_export(['parameters' => ['ignoreErrors' => []]], true) . ';');
+
+        $splitter = new BaselineSplitter("\t", true);
+        file_put_contents($orphanPath, (new PhpBaselineHandler())->encodeBaseline(null, [], "\t"));
+
+        $result = $splitter->split($loaderPath);
+
+        self::assertFileExists($rectorPath);
+        self::assertArrayNotHasKey($rectorPath, $result);
+        self::assertFileDoesNotExist($orphanPath);
+        self::assertArrayHasKey($orphanPath, $result);
+        self::assertSame(0, $result[$orphanPath]);
     }
 
     /**
