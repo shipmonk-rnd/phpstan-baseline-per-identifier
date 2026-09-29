@@ -163,6 +163,30 @@ NEON;
         self::assertLessThan($posB, $posA, 'Error A should come before Error B');
     }
 
+    public function testAbsolutePathOutsideFolderInPhp(): void
+    {
+        $folder = $this->prepareSampleFolder();
+        $loaderPath = $folder . '/baselines/loader.php';
+
+        $inputErrors = [
+            'parameters' => [
+                'ignoreErrors' => [
+                    ['message' => '#^Error A$#', 'count' => 1, 'path' => '/outside/app/a.php', 'identifier' => 'test.identifier'],
+                    ['message' => '#^Error B$#', 'count' => 1, 'path' => $folder . '/baselines/../app/b.php', 'identifier' => 'test.identifier'],
+                ],
+            ],
+        ];
+        file_put_contents($loaderPath, '<?php return ' . var_export($inputErrors, true) . ';');
+
+        $splitter = new BaselineSplitter("\t", true);
+        $splitter->split($loaderPath);
+
+        $result = file_get_contents($folder . '/baselines/test.identifier.php');
+        self::assertNotFalse($result);
+        self::assertStringContainsString("'path' => '/outside/app/a.php',", $result);
+        self::assertStringContainsString("'path' => __DIR__ . '/../app/b.php',", $result);
+    }
+
     public function testNewErrorsInsertedInSortedPosition(): void
     {
         $folder = $this->prepareSampleFolder();
