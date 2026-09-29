@@ -5,7 +5,7 @@ namespace ShipMonk\PHPStan\Baseline\Handler;
 use ShipMonk\PHPStan\Baseline\Exception\ErrorException;
 use Throwable;
 use function file_get_contents;
-use function gettype;
+use function get_debug_type;
 use function is_array;
 use function preg_match;
 use function sprintf;
@@ -23,7 +23,7 @@ class PhpBaselineHandler extends BaselineHandler
             $decoded = (static fn () => require $filepath)();
 
             if (!is_array($decoded)) {
-                throw new ErrorException("File '$filepath' must return array, " . gettype($decoded) . ' given');
+                throw new ErrorException("File '$filepath' must return array, " . get_debug_type($decoded) . ' given');
             }
 
             return $decoded;

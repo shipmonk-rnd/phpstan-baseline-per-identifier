@@ -22,10 +22,7 @@ if (!isset($argv)) {
     throw new LogicException('Missing $argv, check your register_argc_argv setting');
 }
 
-/**
- * @return never
- */
-function error(string $message): void
+function error(string $message): never
 {
     fwrite(STDERR, "\n! $message\n\n");
     exit(1);
