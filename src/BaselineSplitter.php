@@ -58,7 +58,7 @@ class BaselineSplitter
             $fileName = $identifier . '.' . $extension;
             $filePath = $folder . '/' . $fileName;
 
-            $oldErrors = $this->readExistingErrors($filePath, $handler) ?? [];
+            $oldErrors = $this->readExistingErrors($filePath, $handler, $folder) ?? [];
             $sortedErrors = $this->sortErrors($oldErrors, $newErrors);
 
             $errorsCount = array_reduce($sortedErrors, static fn (int $carry, array $item): int => $carry + $item['count'], 0);
@@ -105,7 +105,7 @@ class BaselineSplitter
 
         foreach ($errors as $error) {
             $identifier = $error['identifier'] ?? 'missing-identifier';
-            $normalizedPath = str_replace($folder . '/', '', $error['path']);
+            $normalizedPath = $this->normalizePath($error['path'], $folder);
 
             if (isset($error['rawMessage'])) {
                 $groupedErrors[$identifier][] = [
@@ -126,6 +126,14 @@ class BaselineSplitter
         ksort($groupedErrors);
 
         return $groupedErrors;
+    }
+
+    private function normalizePath(
+        string $path,
+        string $folder,
+    ): string
+    {
+        return str_replace($folder . '/', '', $path);
     }
 
     /**
@@ -157,6 +165,7 @@ class BaselineSplitter
     private function readExistingErrors(
         string $filePath,
         BaselineHandler $handler,
+        string $folder,
     ): ?array
     {
         if (!is_file($filePath)) {
@@ -174,6 +183,8 @@ class BaselineSplitter
 
         foreach ($decoded as $error) {
             unset($error['identifier']);
+            // PHP baselines give absolute paths (__DIR__ is evaluated), new errors have relative paths
+            $error['path'] = $this->normalizePath($error['path'], $folder);
             $errors[] = $error;
         }
 
