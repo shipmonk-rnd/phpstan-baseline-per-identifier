@@ -83,7 +83,7 @@ class BaselineSplitter
         $outputInfo[$realPath] = null;
 
         // Delete orphaned baseline files
-        $deletedFiles = $this->deleteOrphanedFiles($folder, $extension, $loaderFileName, $writtenFiles);
+        $deletedFiles = $this->deleteOrphanedFiles($folder, $extension, $loaderFileName, $writtenFiles, $handler);
 
         foreach ($deletedFiles as $deletedFile) {
             $outputInfo[$deletedFile] = 0;
@@ -240,6 +240,7 @@ class BaselineSplitter
         string $extension,
         string $loaderFileName,
         array $writtenFiles,
+        BaselineHandler $handler,
     ): array
     {
         $deletedFiles = [];
@@ -262,7 +263,11 @@ class BaselineSplitter
                 continue;
             }
 
-            // Delete orphaned file
+            // the folder can contain other files, e.g. phpstan.neon or rector.php
+            if (!$handler->isBaselineFile($existingFile)) {
+                continue;
+            }
+
             if (unlink($existingFile)) {
                 $deletedFiles[] = $existingFile;
             }
